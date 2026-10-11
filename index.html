@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="de"><head><meta charset="utf-8"><title>RelaxoOS</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+*{box-sizing:border-box;user-select:none}
+body{margin:0;height:100vh;overflow:hidden;font:11px Tahoma,Segoe UI,sans-serif;background:#000}
+.scr{position:fixed;inset:0;display:none;z-index:9000;color:#fff;align-items:center;justify-content:center;flex-direction:column}
+#boot{background:#000;display:flex}
+#boot h1{font:italic bold 40px Trebuchet MS,sans-serif;margin:0 0 30px}#boot h1 small{color:#f60;font-size:22px}
+.pb{width:150px;height:14px;border:2px solid #aaa;border-radius:4px;overflow:hidden;position:relative}
+.pb i{position:absolute;top:1px;left:-40px;width:40px;height:8px;background:repeating-linear-gradient(90deg,#3a6fe0 0 10px,transparent 10px 13px);animation:ld 1.4s linear infinite}
+@keyframes ld{to{left:150px}}
+#login{background:linear-gradient(#00309c,#5a7edc 12%,#5a7edc 88%,#00309c)}
+.user{display:flex;align-items:center;gap:14px;background:rgba(0,40,150,.5);padding:14px 24px;border-radius:8px;border:1px solid #9ab}
+.av{width:64px;height:64px;border-radius:8px;background:#f5c542;border:3px solid #fff;font-size:38px;display:flex;align-items:center;justify-content:center}
+#login input{padding:5px;border:1px solid #003;border-radius:3px;width:160px;user-select:text}
+#login button{background:#3a9a3a;color:#fff;border:2px solid #fff;border-radius:4px;padding:6px 16px;font-size:13px;cursor:pointer;font-weight:bold}
+#err{color:#ffd;margin-top:10px;height:16px}
+#off{background:#000;color:#f90;font-size:18px}#bsod{background:#0000aa;font:16px monospace;align-items:flex-start;justify-content:flex-start;padding:30px;white-space:pre-wrap;cursor:pointer}
+#desktop{position:fixed;inset:0;display:none;background:linear-gradient(#245edb,#7fb2f0 70%,#cfe6ff)}
+.icons{position:absolute;top:8px;left:8px;bottom:40px;display:flex;flex-direction:column;flex-wrap:wrap;gap:6px;align-content:flex-start}
+.icon{width:76px;text-align:center;color:#fff;text-shadow:1px 1px 2px #000;padding:4px;border:1px solid transparent}
+.icon b{display:block;font-size:32px;font-weight:normal}.icon:hover,.icon.sel{background:rgba(49,106,197,.45);border-color:#6a9ae0}
+#taskbar{position:absolute;bottom:0;left:0;right:0;height:30px;background:linear-gradient(#3168d5,#2a5cc4 10%,#245edb 90%,#1941a5);display:flex;align-items:center;z-index:8000}
+#start{height:30px;padding:0 20px 0 10px;border:0;border-radius:0 14px 14px 0;background:linear-gradient(#5aa03c,#3c8a22 50%,#2f7a1a);color:#fff;font:italic bold 17px Trebuchet MS,sans-serif;cursor:pointer;text-shadow:1px 1px 2px #000;box-shadow:2px 0 4px rgba(0,0,0,.4)}
+#tasks{flex:1;display:flex;gap:3px;padding:0 6px;overflow:hidden}
+.tb{background:#3c81f3;color:#fff;border:1px solid #1a4cb0;border-radius:3px;padding:0 8px;height:24px;width:150px;text-align:left;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;cursor:pointer}.tb.on{background:#1e52b7;box-shadow:inset 1px 1px 3px #000}
+#tray{background:#0f9bea;color:#fff;height:30px;padding:0 12px;display:flex;align-items:center;gap:10px;border-left:1px solid #0b5fb5}
+#menu{position:absolute;bottom:30px;left:0;width:380px;background:#fff;border:2px solid #245edb;border-radius:8px 8px 0 0;display:none;z-index:8001}
+#menu .hd{background:linear-gradient(#245edb,#4a88ee);color:#fff;padding:8px;font-weight:bold;font-size:14px;border-radius:6px 6px 0 0}
+#menu .cols{display:flex}#menu .c1{width:55%;padding:4px}#menu .c2{width:45%;background:#d3e5fa;padding:4px;border-left:1px solid #95bdee}
+.it{padding:7px 10px;cursor:pointer;font-size:12px;position:relative}.it:hover{background:#316ac5;color:#fff}
+.sub{display:none;position:absolute;left:100%;bottom:-4px;width:200px;background:#fff;border:1px solid #888;color:#000;box-shadow:3px 3px 6px rgba(0,0,0,.4)}.it:hover>.sub{display:block}
+#menu .ft{background:#4a80e0;padding:6px;text-align:right;color:#fff}#menu .ft span{cursor:pointer;margin-left:12px}
+.win{position:absolute;background:#ece9d8;border:3px solid #0a3fc8;border-top:0;border-radius:8px 8px 0 0;display:flex;flex-direction:column;box-shadow:3px 3px 10px rgba(0,0,0,.5);min-width:220px;min-height:120px;resize:both;overflow:hidden}
+.title{height:28px;background:linear-gradient(#0a5fe8,#0054e3 20%,#0044c8);color:#fff;font-weight:bold;display:flex;align-items:center;padding:0 4px 0 8px;cursor:move;flex-shrink:0;text-shadow:1px 1px #000;font-size:12px}
+.title span{flex:1;white-space:nowrap;overflow:hidden}.title button{width:22px;height:22px;margin-left:2px;border:1px solid #fff;border-radius:3px;background:#2a6af0;color:#fff;cursor:pointer;font-weight:bold;padding:0}.title button.x{background:#d9532c}
+.body{flex:1;display:flex;flex-direction:column;min-height:0;position:relative}
+.mb{display:flex;background:#ece9d8;border-bottom:1px solid #aaa}.mb span{padding:3px 8px;cursor:default}.mb span:hover{background:#316ac5;color:#fff}
+.bar{display:flex;gap:4px;padding:3px;border-bottom:1px solid #aaa;align-items:center}.bar button,.dlg button{padding:2px 8px;cursor:pointer;min-width:24px}
+.bar input,.dlg input{flex:1;padding:3px;border:1px solid #7f9db9;user-select:text}
+.exp{display:flex;flex:1;min-height:0}.side{width:150px;background:linear-gradient(#7ba2e7,#6375d6);padding:10px;color:#fff}.side div{padding:4px;cursor:pointer}.side div:hover{text-decoration:underline}
+.files{flex:1;background:#fff;padding:8px;display:flex;flex-wrap:wrap;align-content:flex-start;gap:6px;overflow:auto}
+.f{width:84px;text-align:center;padding:4px;height:78px;word-break:break-all}.f b{display:block;font-size:30px;font-weight:normal}.f.sel{background:#316ac5;color:#fff}
+.files.list{flex-direction:column;flex-wrap:nowrap}.files.list .f{width:auto;height:auto;text-align:left}.files.list .f b{display:inline;font-size:14px}
+.status{padding:3px 8px;border-top:1px solid #aaa}
+iframe{flex:1;border:0;background:#fff;width:100%}textarea{flex:1;border:0;padding:6px;font:13px Lucida Console,monospace;resize:none;outline:0;user-select:text}
+.dlg{padding:14px;display:flex;flex-direction:column;gap:10px;align-items:center}.dlg .r{display:flex;gap:8px;width:100%;justify-content:center}
+#ctx{position:fixed;background:#fff;border:1px solid #888;box-shadow:3px 3px 6px rgba(0,0,0,.4);z-index:9500;display:none;min-width:140px}
+#ctx div{padding:5px 20px;cursor:default}#ctx div:hover{background:#316ac5;color:#fff}
+.calc{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;padding:6px}.calc button{height:30px}.calc input{grid-column:1/6;text-align:right;font-size:18px;height:30px;padding:2px}
+.ms{display:grid;gap:0;margin:8px auto;border:3px inset #fff;width:max-content}.ms button{width:24px;height:24px;padding:0;font:bold 12px sans-serif;border:2px outset #fff;background:#c0c0c0}.ms button.o{border:1px solid #888;background:#d8d8d8}
+.pal{display:flex;gap:2px;padding:3px;flex-wrap:wrap}.pal i{width:18px;height:18px;border:1px solid #000;cursor:pointer}
+table{border-collapse:collapse;width:100%;background:#fff}td,th{padding:3px 6px;border-bottom:1px solid #ddd;text-align:left}tr.sel{background:#316ac5;color:#fff}
+
+.icon{overflow-wrap:anywhere}
+/* Taskleiste, Tray, Ballon */
+#ql{display:flex;align-items:center;gap:2px;padding:0 6px;margin-left:4px;height:30px;border-right:1px solid #1941a5;box-shadow:1px 0 0 rgba(255,255,255,.15)}
+#ql button{width:26px;height:24px;border:1px solid transparent;border-radius:3px;background:transparent;cursor:pointer;font-size:16px;padding:0;line-height:1}
+#ql button:hover{background:rgba(255,255,255,.22);border-color:rgba(255,255,255,.45)}
+#tray span{cursor:default;font-size:13px}#tray span:hover{filter:brightness(1.25)}
+.sep{height:1px;background:#d0d0c8;margin:4px 8px}
+.balloon{position:absolute;right:8px;bottom:38px;width:250px;background:#ffffe1;color:#000;border:1px solid #000;border-radius:8px;padding:10px 12px;z-index:8500;box-shadow:2px 2px 6px rgba(0,0,0,.4);cursor:pointer;font-size:12px}
+.balloon b{display:block;font-size:13px;margin-bottom:3px}
+.balloon:after{content:"";position:absolute;right:30px;bottom:-9px;border:9px solid transparent;border-top-color:#000;border-bottom:0}
+/* Shortcuts in der Mitte */
+.zrcenter{position:absolute;left:0;right:0;top:0;bottom:30px;display:flex;align-items:center;justify-content:center;gap:clamp(24px,6vw,64px);pointer-events:none;flex-wrap:wrap;align-content:center}
+.zrc{pointer-events:auto;width:130px;padding:10px 6px;text-align:center;color:#fff;text-shadow:1px 1px 3px #000;font-size:14px;font-weight:bold;border:1px solid transparent;border-radius:4px;cursor:pointer;text-decoration:none;display:block}
+.zrc:hover,.zrc:focus-visible{background:rgba(49,106,197,.45);border-color:#6a9ae0;outline:0}
+.zrc i{display:flex;align-items:center;justify-content:center;width:72px;height:72px;margin:0 auto 8px;border-radius:16px;font-style:normal;font-size:42px;border:2px solid #fff;box-shadow:2px 3px 8px rgba(0,0,0,.45)}
+.zrc .a{background:linear-gradient(#3b8cff,#0a3fc8)}
+.zrc .b{background:#5865f2}
+/* ZweifachRelaxo-Fenster */
+.zr{position:relative;flex:1;min-height:0;overflow:hidden;background:radial-gradient(ellipse at 20% 15%,#14337a 0%,#0a1a3a 55%,#050d22 100%);color:#e8f0ff;font:15px/1.6 "Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif}
+.zr canvas{position:absolute;left:0;top:0;width:100%;height:100%;display:block}
+.zr-in{position:absolute;inset:0;overflow:auto;display:flex;flex-direction:column;align-items:flex-start;padding:clamp(16px,4vw,36px);pointer-events:none}
+.zr-in>*{pointer-events:auto}
+.zr-h{margin:0 0 24px;font-size:clamp(28px,5vw,48px);line-height:1.05;font-weight:800;letter-spacing:-.02em;text-align:left}
+.zr-panel{margin:auto 0;width:100%;max-width:30rem;background:rgba(8,22,52,.72);border:1px solid rgba(110,170,255,.3);border-radius:10px;padding:24px;text-align:left;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.zr-panel p{margin:0 0 14px}
+.zr-warn{border-left:3px solid #6cb4ff;padding-left:14px}
+.zr-act{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px}
+.zr-btn{display:inline-flex;align-items:center;padding:12px 22px;border-radius:6px;font-weight:700;font-size:15px;text-decoration:none;cursor:pointer;transition:transform .12s ease}
+.zr-btn:hover{transform:translateY(-2px)}
+.zr-btn:focus-visible{outline:3px solid #e8f0ff;outline-offset:3px}
+.zr-dl{background:#6cb4ff;color:#06142e}
+.zr-dc{background:#5865f2;color:#fff}
+.zr-file{display:block;font-size:13px;color:#9db4d9;margin-top:14px}
+@media (prefers-reduced-motion:reduce){.zr-btn{transition:none}.zr-btn:hover{transform:none}}
+</style></head><body>
+
+<div id="boot" class="scr"><h1>Relaxo<small>OS</small></h1><div class="pb"><i></i></div></div>
+<div id="login" class="scr"><h1 style="font:italic bold 34px Trebuchet MS;margin:0 0 26px">Relaxo<small>OS</small></h1>
+<div class="user"><div class="av">👤</div><div><div style="font-size:18px;margin-bottom:6px">Admin</div><button id="loginbtn" onclick="login()">Anmelden</button></div></div>
+<div id="err"></div><div style="margin-top:14px;cursor:pointer" onclick="poweroff()">⏻ Computer ausschalten</div></div>
+<div id="off" class="scr">Der Computer kann jetzt ausgeschaltet werden.<br><br><small style="color:#888;cursor:pointer" onclick="boot()">[ Einschalten ]</small></div>
+<div id="bsod" class="scr" onclick="boot()"></div>
+
+<div id="desktop" oncontextmenu="return dctx(event)">
+<div class="icons" id="icons"></div>
+<div class="zrcenter">
+<div class="zrc" tabindex="0" onclick="launch('ZweifachRelaxo')" onkeydown="if(event.key==='Enter')launch('ZweifachRelaxo')"><i class="a">⭐</i>ZweifachRelaxo</div>
+<a class="zrc" href="https://discord.gg/UsHj38S275" target="_blank" rel="noopener noreferrer" onclick="launch('Discord',1)"><i class="b">💬</i>Discord</a>
+</div>
+<div id="menu"><div class="hd">👤 Admin</div><div class="cols"><div class="c1" id="mL"></div><div class="c2" id="mR"></div></div>
+<div class="ft"><span onclick="logout()">🔑 Abmelden</span><span onclick="shutdlg()">⏻ Ausschalten</span></div></div>
+<div id="taskbar"><button id="start" onclick="toggleMenu()">start</button>
+<div id="ql">
+<button title="ZweifachRelaxo" onclick="launch('ZweifachRelaxo')">⭐</button>
+<button title="Discord" onclick="launch('Discord')">💬</button>
+<button title="Relaxo Browser" onclick="launch('Relaxo Browser')">🌐</button>
+<button title="Explorer" onclick="launch('Explorer')">📁</button>
+<button title="Editor" onclick="launch('Editor')">📝</button>
+<button title="Desktop anzeigen" onclick="showDesk()">🖥️</button>
+</div>
+<div id="tasks"></div><div id="tray"><span title="Sicherheit: Ihr Computer ist geschützt" onclick="msg('Ihr Computer ist geschützt.<br>Virenschutz und Firewall sind aktiv.','Sicherheitscenter','🛡️')">🛡️</span><span title="Netzwerk: Verbunden" onclick="msg('Verbunden mit dem lokalen Netzwerk.<br>Geschwindigkeit: 100 Mbit/s','Netzwerkverbindung','📶')">📶</span><span title="Lautstärke" onclick="beep()">🔊</span><span id="clock" title="Datum" ondblclick="msg(new Date().toLocaleString('de-DE',{dateStyle:'full',timeStyle:'short'}),'Datum und Uhrzeit','🕐')" style="cursor:default"></span></div></div>
+</div><div id="ctx"></div>
+
+<script>
+const WALL=`url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 900' preserveAspectRatio='xMidYMid slice'><defs><linearGradient id='s' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='%231b58c8'/><stop offset='.55' stop-color='%236fb0ec'/><stop offset='1' stop-color='%23d6ecff'/></linearGradient><linearGradient id='a' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='%2397d14a'/><stop offset='1' stop-color='%234a9a1e'/></linearGradient><linearGradient id='b' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='%2377bb2e'/><stop offset='1' stop-color='%232f7a14'/></linearGradient><filter id='f'><feGaussianBlur stdDeviation='14'/></filter></defs><rect width='1600' height='900' fill='url(%23s)'/><g fill='white' filter='url(%23f)' opacity='.9'><ellipse cx='300' cy='200' rx='220' ry='45'/><ellipse cx='430' cy='170' rx='150' ry='40'/><ellipse cx='1100' cy='140' rx='260' ry='38'/><ellipse cx='1300' cy='260' rx='200' ry='34'/><ellipse cx='760' cy='320' rx='170' ry='28'/></g><path d='M0 520 C250 430 600 440 900 520 S1400 570 1600 480 V900 H0Z' fill='url(%23a)'/><path d='M0 640 C300 560 650 600 950 660 S1400 700 1600 610 V900 H0Z' fill='url(%23b)'/><path d='M0 780 C400 720 900 760 1600 740 V900 H0Z' fill='%23267010' opacity='.55'/></svg>") center/cover no-repeat`;
+const $=s=>document.querySelector(s),sleep=ms=>new Promise(r=>setTimeout(r,ms));
+let AC;function tone(f,t,d,v=.15){try{AC=AC||new AudioContext();const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=f;o.type='sine';g.gain.setValueAtTime(v,AC.currentTime+t);g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+t+d);o.connect(g);g.connect(AC.destination);o.start(AC.currentTime+t);o.stop(AC.currentTime+t+d)}catch(e){}}
+function chime(){[[523,0],[659,.25],[784,.5],[1047,.8]].forEach(([f,t])=>tone(f,t,1))}function beep(){tone(880,0,.2)}
+function show(id){document.querySelectorAll('.scr').forEach(s=>s.style.display='none');$('#desktop').style.display='none';if(id)$('#'+id).style.display='flex'}
+async function boot(){show('boot');await sleep(2800);show('login');$('#loginbtn').focus()}
+function login(){$('#err').textContent='';show();$('#desktop').style.display='block';chime();loadBg();setTimeout(()=>{if($('#desktop').style.display==='block')balloon('Willkommen zurück, Admin','Klicken Sie hier, um ZweifachRelaxo zu öffnen.',()=>launch('ZweifachRelaxo'))},1500)}
+function closeAll(){document.querySelectorAll('.balloon').forEach(b=>b.remove());document.querySelectorAll('.win').forEach(w=>w.remove());$('#tasks').innerHTML='';hideMenu()}
+function logout(){closeAll();show('login')}function poweroff(){closeAll();show('off')}
+function reboot(){closeAll();boot()}
+function bluescreen(){closeAll();show('bsod');$('#bsod').textContent='A problem has been detected and RelaxoOS has been shut down to prevent damage to your computer.\n\nUSER_TRIED_TOO_MUCH_STUFF\n\nIf this is the first time you\'ve seen this stop error screen, restart your computer.\n\n*** STOP: 0x0000007B (0xF78D2524,0xC0000034,0x00000000)\n\n[ Klicken zum Neustart ]'}
+$('#desktop').addEventListener('mousedown',e=>{if(!e.target.closest('#menu')&&e.target.id!=='start')hideMenu();hideCtx();if(e.target.id==='desktop'||e.target.id==='icons')document.querySelectorAll('.icon').forEach(i=>i.classList.remove('sel'))});
+setInterval(()=>{const d=new Date();$('#clock').textContent=d.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});$('#clock').title=d.toLocaleDateString('de-DE',{dateStyle:'full'})},1000);
+function toggleMenu(){const m=$('#menu');if(m.style.display!=='block')buildL();m.style.display=m.style.display==='block'?'none':'block'}function hideMenu(){$('#menu').style.display='none'}
+function ctx(x,y,items){const c=$('#ctx');c.innerHTML='';items.forEach(([l,f])=>{const d=document.createElement('div');d.textContent=l;d.onmousedown=e=>{e.stopPropagation();hideCtx();f()};c.appendChild(d)});c.style.left=Math.min(x,innerWidth-170)+'px';c.style.top=Math.min(y,innerHeight-items.length*26-10)+'px';c.style.display='block'}
+function hideCtx(){$('#ctx').style.display='none'}document.addEventListener('mousedown',e=>{if(!e.target.closest('#ctx'))hideCtx()});
+function dctx(e){if(e.target.closest('.win,#menu,#taskbar'))return false;e.preventDefault();ctx(e.clientX,e.clientY,[['Aktualisieren',()=>{}],['Neuer Ordner',()=>{mk(DESK,'Neuer Ordner',D({}));drawIcons()}],['Neue Textdatei',()=>{mk(DESK,'Neu.txt',F(''));drawIcons()}],['Eigenschaften',openDisplay]]);return false}
+
+/* Fenster */
+let z=100,n=0;
+function createWindow(title,icon,w,h){
+ const win=document.createElement('div');win.className='win';win.dataset.t=icon+' '+title;
+ win.style.cssText=`width:${w}px;height:${h}px;left:${50+(n*28)%220}px;top:${20+(n*28)%140}px;z-index:${++z}`;n++;
+ win.innerHTML=`<div class="title"><span>${icon} ${title}</span><button class="m">_</button><button class="mx">□</button><button class="x">✕</button></div><div class="body"></div>`;
+ $('#desktop').appendChild(win);const tb=document.createElement('button');tb.className='tb on';tb.textContent=icon+' '+title;$('#tasks').appendChild(tb);
+ const focus=()=>{win.style.zIndex=++z;win.style.display='flex';document.querySelectorAll('.tb').forEach(t=>t.classList.remove('on'));tb.classList.add('on')};
+ win.addEventListener('mousedown',focus);
+ tb.onclick=()=>{win.style.display==='none'||!tb.classList.contains('on')?focus():(win.style.display='none',tb.classList.remove('on'))};
+ win.close=()=>{win.remove();tb.remove()};
+ win.querySelector('.m').onclick=()=>{win.style.display='none';tb.classList.remove('on')};win.querySelector('.x').onclick=win.close;
+ let max=false,old;const mx=()=>{if(!max){old=win.style.cssText;win.style.cssText+=';left:0;top:0;width:100%;height:calc(100% - 30px)'}else win.style.cssText=old;max=!max};
+ win.querySelector('.mx').onclick=mx;
+ const t=win.querySelector('.title');t.ondblclick=e=>{if(e.target.tagName!=='BUTTON')mx()};
+ t.onmousedown=e=>{if(e.target.tagName==='BUTTON'||max)return;const dx=e.clientX-win.offsetLeft,dy=e.clientY-win.offsetTop,fs=document.querySelectorAll('iframe');fs.forEach(f=>f.style.pointerEvents='none');
+  const mv=ev=>{win.style.left=ev.clientX-dx+'px';win.style.top=Math.max(0,ev.clientY-dy)+'px'},up=()=>{document.removeEventListener('mousemove',mv);document.removeEventListener('mouseup',up);fs.forEach(f=>f.style.pointerEvents='')};
+  document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up)};
+ const b=win.querySelector('.body');b.win=win;return b}
+function menubar(b,m){const bar=document.createElement('div');bar.className='mb';for(const k in m){const s=document.createElement('span');s.textContent=k;s.onmousedown=e=>{e.stopPropagation();const r=s.getBoundingClientRect();ctx(r.left,r.bottom,m[k])};bar.appendChild(s)}b.prepend(bar)}
+function msg(text,title='RelaxoOS',icon='ℹ️'){const b=createWindow(title,icon,320,150);b.win.style.resize='none';b.className+=' dlg';b.innerHTML=`<div style="font-size:13px;text-align:center;margin-top:8px">${icon} ${text}</div><div class="r"><button>OK</button></div>`;b.querySelector('button').onclick=b.win.close;beep()}
+function ask(text,def,cb,title='Eingabe'){const b=createWindow(title,'✏️',340,150);b.win.style.resize='none';b.className+=' dlg';b.innerHTML=`<div>${text}</div><input value="${def||''}"><div class="r"><button class="ok">OK</button><button class="no">Abbrechen</button></div>`;const i=b.querySelector('input');i.focus();i.select();i.onkeydown=e=>{if(e.key==='Enter')b.querySelector('.ok').click()};b.querySelector('.ok').onclick=()=>{b.win.close();cb(i.value)};b.querySelector('.no').onclick=b.win.close}
+function shutdlg(){hideMenu();const b=createWindow('Computer ausschalten','⏻',320,150);b.win.style.resize='none';b.className+=' dlg';b.innerHTML=`<div style="font-size:13px">Was soll der Computer tun?</div><div class="r"><button>Standby</button><button>Ausschalten</button><button>Neu starten</button></div>`;const bt=b.querySelectorAll('button');bt[0].onclick=()=>{b.win.close();logout()};bt[1].onclick=poweroff;bt[2].onclick=reboot}
+
+/* Dateisystem (bleibt im Browser gespeichert) */
+const D=c=>({t:'d',c}),F=x=>({t:'f',x});
+let FS;try{FS=JSON.parse(localStorage.getItem('rxfs2'))}catch(e){}
+if(!FS)FS=D({'C:':D({'Eigene Dateien':D({'Willkommen.txt':F('Willkommen bei RelaxoOS!\nBenutzer: Admin'),'Notizen.txt':F('Einkaufsliste:\n- Brot\n- Milch'),'Bilder':D({}),'Musik':D({}),'Minecraft':D({'Mods':D({'Hinweis.txt':F('Die Mod-Datei kannst du über den Shortcut ZweifachRelaxo herunterladen.')}),'Welten':D({})})}),'Programme':D({'Relaxo Browser':D({}),'Minenfeld':D({}),'ZweifachRelaxo':D({})}),'RELAXO':D({'system32':D({}),'readme.txt':F('Systemdatei.')}),'Desktop':D({'Changelog.txt':F('invswitcher 1.0.0\n\n- Zwischen mehreren Inventaren wechseln\n- Beim Verlassen des Servers oder der Welt werden alle Inventare außer dem aktuellen gelöscht'),'Zu erledigen.txt':F('- Neue Version testen\n- Discord pflegen\n- Backup machen')})}),'D:':D({'Backup':D({})})});
+const save=()=>{try{localStorage.setItem('rxfs2',JSON.stringify(FS))}catch(e){}},getDir=p=>p.reduce((d,k)=>d.c[k],FS),DESK=['C:','Desktop'];
+function mk(p,k,o){getDir(p).c[k]=o;save()}
+function openItem(p,k){const o=getDir(p).c[k];if(o.t==='d')openExplorer([...p,k]);else if(/\.(png|jpg|jpeg|gif)$/i.test(k)&&o.x.startsWith('data:'))viewImg(k,o.x);else notepad(k,o.x,o)}
+function viewImg(k,src){const b=createWindow(k,'🖼️',500,380);b.innerHTML=`<img src="${src}" style="max-width:100%;max-height:100%;margin:auto">`}
+function drawIcons(){const c=$('#icons');c.innerHTML='';
+ const base=[['💻','Arbeitsplatz',()=>openExplorer([])],['📁','Eigene Dateien',()=>openExplorer(['C:','Eigene Dateien'])],['🌐','Relaxo Browser',()=>browser()],['📝','Editor',()=>notepad('Unbenannt','')],['🗑️','Papierkorb',()=>msg('Der Papierkorb ist leer.')]];
+ base.forEach(([i,t,f])=>addIcon(c,i,t,f));
+ Object.entries(getDir(DESK).c).forEach(([k,o])=>addIcon(c,o.t==='d'?'📁':'📄',k,()=>openItem(DESK,k),k))}
+function addIcon(c,i,t,f,k){const d=document.createElement('div');d.className='icon';d.innerHTML=`<b>${i}</b>${t}`;d.onmousedown=e=>{document.querySelectorAll('.icon').forEach(x=>x.classList.remove('sel'));d.classList.add('sel')};d.ondblclick=f;
+ if(k)d.oncontextmenu=e=>{e.preventDefault();e.stopPropagation();ctx(e.clientX,e.clientY,[['Öffnen',f],['Umbenennen',()=>ask('Neuer Name:',k,v=>{if(v&&!getDir(DESK).c[v]){const o=getDir(DESK).c[k];delete getDir(DESK).c[k];mk(DESK,v,o);drawIcons()}})],['Löschen',()=>{delete getDir(DESK).c[k];save();drawIcons()}]])};c.appendChild(d)}
+
+/* Explorer */
+function openExplorer(path){
+ const b=createWindow('Explorer','📁',660,430);let p=path.slice(),hist=[],sel=null,list=false;
+ b.innerHTML=`<div class="bar"><button class="bk">◀ Zurück</button><button class="up">▲ Hoch</button><span>Adresse:</span><input class="ad" readonly></div><div class="exp"><div class="side"><b>Orte</b><div data-p="">💻 Arbeitsplatz</div><div data-p="C:">💾 Lokaler Datenträger (C:)</div><div data-p="C:/Eigene Dateien">📁 Eigene Dateien</div><div data-p="C:/Desktop">🖥️ Desktop</div><div data-p="D:">💿 Laufwerk (D:)</div></div><div class="files"></div></div><div class="status"></div>`;
+ const fl=b.querySelector('.files');
+ const nav=np=>{hist.push(p.slice());p=np;render()},cur=()=>getDir(p);
+ const ren=()=>sel&&ask('Neuer Name:',sel,v=>{if(v&&!cur().c[v]){const o=cur().c[sel];delete cur().c[sel];mk(p,v,o);render()}}),del=()=>{if(sel&&p.length){delete cur().c[sel];save();render()}};
+ const nw=(t)=>p.length&&ask(t?'Ordnername:':'Dateiname:',t?'Neuer Ordner':'Neu.txt',v=>{if(v){mk(p,v,t?D({}):F(''));render()}});
+ const imp=()=>{if(!p.length)return;const i=document.createElement('input');i.type='file';i.onchange=()=>{const f=i.files[0],r=new FileReader();r.onload=()=>{mk(p,f.name,F(r.result));render()};/^image/.test(f.type)?r.readAsDataURL(f):r.readAsText(f)};i.click()};
+ menubar(b,{Datei:[['Neuer Ordner',()=>nw(1)],['Neue Textdatei',()=>nw(0)],['Datei importieren…',imp],['Schließen',b.win.close]],Bearbeiten:[['Umbenennen',ren],['Löschen',del]],Ansicht:[['Symbole',()=>{list=false;render()}],['Liste',()=>{list=true;render()}]],'?':[['Info',()=>msg('Explorer<br>Dateien bleiben im Browser gespeichert.','Info')]]});
+ function render(){const d=cur();sel=null;fl.innerHTML='';fl.className='files'+(list?' list':'');b.querySelector('.ad').value=p.length?p.join('\\')+'\\':'Arbeitsplatz';
+  Object.keys(d.c).sort((a,c)=>d.c[a].t===d.c[c].t?a.localeCompare(c):d.c[a].t==='d'?-1:1).forEach(k=>{const e=document.createElement('div');e.className='f';e.innerHTML=`<b>${d.c[k].t==='d'?(k.endsWith(':')?'💾':'📁'):(d.c[k].x.startsWith('data:image')?'🖼️':'📄')}</b>${k}`;
+   e.onmousedown=()=>{fl.querySelectorAll('.f').forEach(x=>x.classList.remove('sel'));e.classList.add('sel');sel=k};
+   e.ondblclick=()=>{d.c[k].t==='d'?nav([...p,k]):openItem(p,k)};
+   e.oncontextmenu=ev=>{ev.preventDefault();ev.stopPropagation();e.onmousedown();ctx(ev.clientX,ev.clientY,[['Öffnen',e.ondblclick],['Umbenennen',ren],['Löschen',del]])};fl.appendChild(e)});
+  b.querySelector('.status').textContent=Object.keys(d.c).length+' Objekt(e)';if(p[0]==='C:'&&p[1]==='Desktop')drawIcons()}
+ fl.oncontextmenu=e=>{e.preventDefault();ctx(e.clientX,e.clientY,[['Neuer Ordner',()=>nw(1)],['Neue Textdatei',()=>nw(0)],['Aktualisieren',render]])};
+ b.querySelector('.bk').onclick=()=>{if(hist.length){p=hist.pop();render()}};b.querySelector('.up').onclick=()=>{if(p.length)nav(p.slice(0,-1))};
+ b.querySelectorAll('.side div').forEach(s=>s.onclick=()=>nav(s.dataset.p?s.dataset.p.split('/'):[]));
+ new MutationObserver(()=>{}).observe(b,{});b.win.addEventListener('keydown',e=>{if(e.key==='F2')ren();if(e.key==='Delete')del()});render()}
+
+/* Editor */
+function notepad(name,text,file){const b=createWindow(name+' - Editor','📝',500,360);b.innerHTML=`<textarea></textarea>`;const ta=b.querySelector('textarea');ta.value=text||'';
+ const sv=()=>{if(file){file.x=ta.value;save()}else ask('Speichern unter (Eigene Dateien):',name+'.txt',k=>{if(k){file=F(ta.value);mk(['C:','Eigene Dateien'],k,file);b.win.querySelector('.title span').textContent='📝 '+k+' - Editor'}})};
+ menubar(b,{Datei:[['Neu',()=>notepad('Unbenannt','')],['Speichern',sv],['Beenden',b.win.close]],Bearbeiten:[['Datum/Uhrzeit',()=>ta.setRangeText(new Date().toLocaleString('de-DE'),ta.selectionStart,ta.selectionEnd,'end')],['Alles markieren',()=>ta.select()]],Format:[['Schrift größer',()=>ta.style.fontSize=(parseInt(ta.style.fontSize||13)+2)+'px'],['Schrift kleiner',()=>ta.style.fontSize=(parseInt(ta.style.fontSize||13)-2)+'px']]});
+ ta.onkeydown=e=>{if(e.ctrlKey&&e.key==='s'){e.preventDefault();sv()}}}
+
+/* Browser */
+const HOME=`<body style="font-family:Tahoma,sans-serif;background:#f4f8ff;padding:30px"><h2>🌐 Startseite</h2><p>Adresse oder Suchbegriff oben eingeben.</p><ul>${[['Wikipedia','https://de.wikipedia.org'],['OpenStreetMap','https://www.openstreetmap.org/export/embed.html'],['Internet Archive','https://archive.org'],['Wikibooks','https://de.wikibooks.org']].map(([a,u])=>`<li><a href="#" onclick="parent.postMessage({go:'${u}'},'*');return false">${a}</a></li>`).join('')}</ul><p style="color:#666">Manche Seiten (Google, YouTube) verbieten Einbettung – dafür „↗ Neuer Tab“.</p></body>`;
+function browser(){const b=createWindow('Relaxo Browser','🌐',780,500);let h=[],i=-1;
+ b.innerHTML=`<div class="bar"><button class="bk">◀</button><button class="fw">▶</button><button class="rl">⟳</button><button class="hm">🏠</button><span>Adresse:</span><input class="ad"><button class="go">➜ Wechseln zu</button><button class="ext">↗ Neuer Tab</button></div><iframe></iframe>`;
+ const fr=b.querySelector('iframe'),ad=b.querySelector('.ad');
+ const load=()=>{const u=h[i];ad.value=u;if(u==='about:home'){fr.removeAttribute('src');fr.srcdoc=HOME}else{fr.removeAttribute('srcdoc');fr.src=u}};
+ const go=u=>{u=u.trim();if(!u)return;if(u!=='about:home'&&!/^https?:\/\//i.test(u))u=(/\s/.test(u)||!u.includes('.'))?'https://de.wikipedia.org/w/index.php?search='+encodeURIComponent(u):'https://'+u;h=h.slice(0,i+1);h.push(u);i++;load()};
+ const onm=e=>{if(!document.body.contains(b))return removeEventListener('message',onm);if(e.source===fr.contentWindow&&e.data&&e.data.go)go(e.data.go)};addEventListener('message',onm);
+ b.querySelector('.go').onclick=()=>go(ad.value);ad.onkeydown=e=>{if(e.key==='Enter')go(ad.value)};
+ b.querySelector('.bk').onclick=()=>{if(i>0){i--;load()}};b.querySelector('.fw').onclick=()=>{if(i<h.length-1){i++;load()}};b.querySelector('.rl').onclick=load;b.querySelector('.hm').onclick=()=>go('about:home');
+ b.querySelector('.ext').onclick=()=>{if(h[i]!=='about:home')open(h[i],'_blank')};go('about:home')}
+
+/* Rechner */
+function calc(){const b=createWindow('Rechner','🧮',250,270);b.win.style.resize='none';b.innerHTML=`<div class="calc"><input readonly value="0"></div>`;const g=b.firstChild,o=g.firstChild;let cur='0',acc=null,op=null,fresh=true;
+ const ap=(a,b,o)=>o==='+'?a+b:o==='-'?a-b:o==='×'?a*b:o==='÷'?(b?a/b:NaN):b;
+ '7 8 9 ÷ C 4 5 6 × ± 1 2 3 - √ 0 . = + %'.split(' ').forEach(k=>{const x=document.createElement('button');x.textContent=k;x.onclick=()=>{
+  if(/\d/.test(k)){cur=fresh||cur==='0'?k:cur+k;fresh=false}else if(k==='.'){if(!cur.includes('.'))cur+='.';fresh=false}
+  else if(k==='C'){cur='0';acc=op=null;fresh=true}else if(k==='±')cur=String(-cur);else if(k==='√')cur=String(Math.sqrt(cur));else if(k==='%')cur=String(cur/100);
+  else{const v=parseFloat(cur);acc=op&&!fresh?ap(acc,v,op):v;cur=String(+acc.toFixed(10));op=k==='='?null:k;fresh=true}
+  o.value=cur==='NaN'?'Fehler':cur};g.appendChild(x)})}
+
+/* Zeichnen */
+function paint(){const b=createWindow('Unbenannt - Zeichnen','🎨',620,470);const cols='#000 #fff #f00 #0a0 #00f #ff0 #f80 #f0f #0ff #840 #888 #ccc'.split(' ');
+ b.innerHTML=`<div class="bar"><button class="pen">✏️ Stift</button><button class="er">🧽 Radierer</button><button class="fl">🪣 Füllen</button>Größe <input type="range" min="1" max="30" value="3" style="flex:0 0 90px"><button class="cl">Neu</button><button class="sv">Speichern</button></div><div class="pal"></div><div style="flex:1;overflow:auto;background:#808080;padding:4px"><canvas width="900" height="600" style="background:#fff;cursor:crosshair"></canvas></div>`;
+ const cv=b.querySelector('canvas'),c=cv.getContext('2d');c.lineCap='round';c.lineJoin='round';let col='#000',tool='pen',sz=3,dr=false;
+ cols.forEach(k=>{const i=document.createElement('i');i.style.background=k;i.onclick=()=>{col=k;tool=tool==='er'?'pen':tool};b.querySelector('.pal').appendChild(i)});
+ b.querySelector('.pen').onclick=()=>tool='pen';b.querySelector('.er').onclick=()=>tool='er';b.querySelector('.fl').onclick=()=>tool='fl';b.querySelector('input').oninput=e=>sz=+e.target.value;
+ b.querySelector('.cl').onclick=()=>c.clearRect(0,0,900,600);b.querySelector('.sv').onclick=()=>ask('Dateiname:','Bild.png',k=>{if(k)mk(['C:','Eigene Dateien','Bilder'],k.endsWith('.png')?k:k+'.png',F(cv.toDataURL()))});
+ const pos=e=>{const r=cv.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top]};
+ function fill(x,y){const im=c.getImageData(0,0,900,600),d=im.data,i0=(Math.floor(y)*900+Math.floor(x))*4,t=[d[i0],d[i0+1],d[i0+2],d[i0+3]],cc=document.createElement('canvas').getContext('2d');cc.fillStyle=col;cc.fillRect(0,0,1,1);const f=cc.getImageData(0,0,1,1).data;if(t[0]===f[0]&&t[1]===f[1]&&t[2]===f[2]&&t[3]===255)return;const st=[[Math.floor(x),Math.floor(y)]];
+  while(st.length){const[px,py]=st.pop();if(px<0||py<0||px>=900||py>=600)continue;const i=(py*900+px)*4;if(d[i]!==t[0]||d[i+1]!==t[1]||d[i+2]!==t[2]||d[i+3]!==t[3])continue;d[i]=f[0];d[i+1]=f[1];d[i+2]=f[2];d[i+3]=255;st.push([px+1,py],[px-1,py],[px,py+1],[px,py-1])}c.putImageData(im,0,0)}
+ cv.onmousedown=e=>{const[x,y]=pos(e);if(tool==='fl'){fill(x,y);return}dr=true;c.beginPath();c.moveTo(x,y)};
+ cv.onmousemove=e=>{if(!dr)return;const[x,y]=pos(e);c.strokeStyle=tool==='er'?'#fff':col;c.lineWidth=tool==='er'?sz*3:sz;c.lineTo(x,y);c.stroke()};
+ addEventListener('mouseup',()=>dr=false)}
+
+/* Minenfeld */
+function mines(){const b=createWindow('Minenfeld','💣',260,330);b.win.style.resize='none';const N=9,M=10;let cells,over,left;
+ b.innerHTML=`<div class="bar" style="justify-content:space-between"><span class="cnt">💣 10</span><button class="rs">🙂</button></div><div class="ms" style="grid-template-columns:repeat(${N},24px)"></div>`;const g=b.querySelector('.ms'),rs=b.querySelector('.rs');
+ function init(){g.innerHTML='';over=false;left=N*N-M;rs.textContent='🙂';cells=[];const mset=new Set();while(mset.size<M)mset.add(Math.floor(Math.random()*N*N));
+  for(let i=0;i<N*N;i++){const el=document.createElement('button');cells.push({el,m:mset.has(i),o:false,f:false,i});g.appendChild(el);el.onclick=()=>open(i);el.oncontextmenu=e=>{e.preventDefault();if(over||cells[i].o)return;cells[i].f=!cells[i].f;el.textContent=cells[i].f?'🚩':''}}}
+ const nb=i=>{const x=i%N,y=Math.floor(i/N),r=[];for(let dx=-1;dx<=1;dx++)for(let dy=-1;dy<=1;dy++){const a=x+dx,c=y+dy;if((dx||dy)&&a>=0&&c>=0&&a<N&&c<N)r.push(c*N+a)}return r};
+ function open(i){const c=cells[i];if(over||c.o||c.f)return;c.o=true;c.el.classList.add('o');
+  if(c.m){over=true;c.el.textContent='💥';cells.forEach(k=>{if(k.m&&k!==c)k.el.textContent='💣'});rs.textContent='😵';return}
+  const k=nb(i).filter(j=>cells[j].m).length;c.el.textContent=k||'';c.el.style.color=['','#00f','#080','#f00','#008','#800','#088','#000','#888'][k];
+  if(!k)nb(i).forEach(open);if(--left===0){over=true;rs.textContent='😎'}}
+ rs.onclick=init;init()}
+
+/* Task-Manager, Eigenschaften, Ausführen */
+function taskmgr(){const b=createWindow('Task-Manager','📊',380,340);b.innerHTML=`<div style="flex:1;overflow:auto;background:#fff"><table><thead><tr><th>Anwendung</th></tr></thead><tbody></tbody></table></div><div class="bar"><button class="end">Task beenden</button><span class="s"></span></div>`;let s=null;const tbd=b.querySelector('tbody');
+ const upd=()=>{if(!document.body.contains(b))return clearInterval(iv);const ws=[...document.querySelectorAll('.win')].filter(w=>w!==b.win);tbd.innerHTML='';ws.forEach(w=>{const r=document.createElement('tr');r.innerHTML=`<td>${w.dataset.t}</td>`;if(w===s)r.className='sel';r.onclick=()=>{s=w;upd()};tbd.appendChild(r)});b.querySelector('.s').textContent=ws.length+' Anwendung(en)'},iv=setInterval(upd,1500);
+ b.querySelector('.end').onclick=()=>{if(s){s.close();s=null;upd()}};upd()}
+function sysinfo(){msg('<b>System:</b><br>RelaxoOS<br>Version 1.0<br><br>Registriert für: Admin<br>Virtueller Prozessor, 512 MB RAM','Systemeigenschaften','💻')}
+/* ZweifachRelaxo: Hauptfenster in der Mitte des Desktops */
+function openZR(){
+ const ex=document.querySelector('.win[data-zr]');
+ if(ex){ex.dispatchEvent(new Event('mousedown'));return}
+ const W=Math.min(960,Math.round(innerWidth*.92)),H=Math.min(600,Math.round(innerHeight-30-16));
+ const b=createWindow('ZweifachRelaxo','⭐',W,H);
+ b.win.dataset.zr='1';
+ b.win.style.left=Math.max(0,Math.round((innerWidth-W)/2))+'px';
+ b.win.style.top=Math.max(0,Math.round((innerHeight-30-H)/2))+'px';
+ b.innerHTML=`<div class="zr"><canvas></canvas><div class="zr-in"><h1 class="zr-h">ZweifachRelaxo</h1><section class="zr-panel"><p>Mit dieser Datei kannst du zwischen mehreren Inventaren wechseln.</p><p class="zr-warn"><strong>Wichtig:</strong> Wenn du den Server oder die Welt verlässt, werden alle Inventare außer dem aktuellen gelöscht.</p><div class="zr-act"><a class="zr-btn zr-dl" href="invswitcher-1_0_0.jar" download>Datei herunterladen</a><a class="zr-btn zr-dc" href="https://discord.gg/UsHj38S275" target="_blank" rel="noopener noreferrer">Discord beitreten</a></div><span class="zr-file">invswitcher-1_0_0.jar</span></section></div></div>`;
+ const box=b.querySelector('.zr'),cv=b.querySelector('canvas'),c=cv.getContext('2d');
+ const COL='130, 190, 255',MR=190,LR=110;let w=0,h=0,dots=[],mx=null,my=null,seed=20240611;
+ const rand=()=>{seed=(seed*1664525+1013904223)%4294967296;return seed/4294967296};
+ function build(){
+  const dpr=Math.min(devicePixelRatio||1,2);w=box.clientWidth;h=box.clientHeight;if(!w||!h)return;
+  cv.width=w*dpr;cv.height=h*dpr;c.setTransform(dpr,0,0,dpr,0,0);
+  seed=20240611;dots=[];const n=Math.min(140,Math.round(w*h/11000));
+  for(let i=0;i<n;i++)dots.push({x:rand()*w,y:rand()*h,r:1+rand()*1.4});
+  draw()}
+ function draw(){
+  c.clearRect(0,0,w,h);
+  for(let i=0;i<dots.length;i++){const d=dots[i];
+   c.beginPath();c.arc(d.x,d.y,d.r,0,Math.PI*2);c.fillStyle='rgba('+COL+',.55)';c.fill();
+   for(let j=i+1;j<dots.length;j++){const o=dots[j],dx=d.x-o.x,dy=d.y-o.y,dist=Math.sqrt(dx*dx+dy*dy);
+    if(dist<LR){c.beginPath();c.moveTo(d.x,d.y);c.lineTo(o.x,o.y);c.strokeStyle='rgba('+COL+','+(.14*(1-dist/LR))+')';c.lineWidth=1;c.stroke()}}
+   if(mx!==null){const ax=d.x-mx,ay=d.y-my,md=Math.sqrt(ax*ax+ay*ay);
+    if(md<MR){c.beginPath();c.moveTo(d.x,d.y);c.lineTo(mx,my);c.strokeStyle='rgba('+COL+','+(.7*(1-md/MR))+')';c.lineWidth=1.2;c.stroke()}}}}
+ const setM=(x,y)=>{const r=box.getBoundingClientRect();mx=x-r.left;my=y-r.top;draw()};
+ box.addEventListener('mousemove',e=>setM(e.clientX,e.clientY));
+ box.addEventListener('mouseleave',()=>{mx=my=null;draw()});
+ box.addEventListener('touchmove',e=>setM(e.touches[0].clientX,e.touches[0].clientY),{passive:true});
+ box.addEventListener('touchend',()=>{mx=my=null;draw()});
+ const ro=new ResizeObserver(()=>{if(!box.isConnected){ro.disconnect();return}build()});ro.observe(box);
+}
+const BGS={'Wiese':'','Dunkelblau':'#1a3c8c','Schwarz':'#000','Blaugrün':'#008080','Sonnenuntergang':'linear-gradient(#2b1055,#d4506c 60%,#f8b66a)'};
+function loadBg(){const v=localStorage.getItem('rxbg');$('#desktop').style.background=v!==null?v:WALL;drawIcons()}
+function openDisplay(){const b=createWindow('Eigenschaften von Anzeige','🖥️',320,260);b.className+=' dlg';b.innerHTML=`<div style="font-size:13px">Desktophintergrund:</div><div class="r" style="flex-wrap:wrap"></div>`;
+ Object.entries(BGS).forEach(([k,v])=>{const x=document.createElement('button');x.textContent=k;x.onclick=()=>{const bg=v||WALL;$('#desktop').style.background=bg;try{localStorage.setItem('rxbg',bg)}catch(e){}};b.querySelector('.r').appendChild(x)})}
+function control(){const b=createWindow('Systemsteuerung','⚙️',420,280);b.innerHTML=`<div class="files"></div>`;[['🖥️','Anzeige',openDisplay],['💻','System',sysinfo],['📊','Task-Manager',taskmgr],['🕐','Datum/Uhrzeit',()=>msg(new Date().toLocaleString('de-DE'),'Datum und Uhrzeit','🕐')]].forEach(([i,t,f])=>{const e=document.createElement('div');e.className='f';e.innerHTML=`<b>${i}</b>${t}`;e.ondblclick=f;b.firstChild.appendChild(e)})}
+const APPS={notepad:()=>notepad('Unbenannt',''),editor:()=>notepad('Unbenannt',''),calc:calc,rechner:calc,mspaint:paint,paint:paint,iexplore:browser,explorer:()=>openExplorer([]),winmine:mines,taskmgr:taskmgr,control:control,bluescreen:bluescreen,cmd:()=>msg('Die Eingabeaufforderung ist in dieser Version nicht verfügbar.','cmd')};
+function run(){hideMenu();ask('Geben Sie den Namen eines Programms ein (z. B. notepad, calc, mspaint, winmine, taskmgr, control):','',v=>{v=v.trim().toLowerCase().replace(/\.exe$/,'');APPS[v]?APPS[v]():msg(`RelaxoOS kann '${v}' nicht finden.`,'Ausführen','❌')},'Ausführen')}
+document.addEventListener('keydown',e=>{if(e.ctrlKey&&e.altKey&&e.key==='Delete'&&$('#desktop').style.display==='block'){e.preventDefault();taskmgr()}});
+
+/* Programme, Nutzung, Startmenü */
+const DISCORD='https://discord.gg/UsHj38S275';
+const APPLIST={
+ 'ZweifachRelaxo':['⭐',()=>openZR()],
+ 'Discord':['💬',()=>open(DISCORD,'_blank','noopener')],
+ 'Relaxo Browser':['🌐',()=>browser()],
+ 'Editor':['📝',()=>notepad('Unbenannt','')],
+ 'Rechner':['🧮',()=>calc()],
+ 'Zeichnen':['🎨',()=>paint()],
+ 'Minenfeld':['💣',()=>mines()],
+ 'Explorer':['📁',()=>openExplorer([])],
+ 'Task-Manager':['📊',()=>taskmgr()],
+ 'Systemsteuerung':['⚙️',()=>control()]
+};
+function getUse(){let u;try{u=JSON.parse(localStorage.getItem('rxuse'))}catch(e){}return u||{'Minenfeld':9,'Relaxo Browser':6,'Editor':4,'Rechner':3,'Zeichnen':2}}
+function launch(n,noRun){hideMenu();const u=getUse();u[n]=(u[n]||0)+1;try{localStorage.setItem('rxuse',JSON.stringify(u))}catch(e){}if(!noRun)APPLIST[n][1]()}
+function showDesk(){document.querySelectorAll('.win').forEach(w=>w.style.display='none');document.querySelectorAll('.tb').forEach(t=>t.classList.remove('on'));hideMenu()}
+function balloon(t,x,f){document.querySelectorAll('.balloon').forEach(b=>b.remove());const d=document.createElement('div');d.className='balloon';d.innerHTML=`<b>${t}</b>${x}`;d.onclick=()=>{d.remove();f()};$('#desktop').appendChild(d);tone(660,0,.3,.08);setTimeout(()=>d.remove(),8000)}
+$('#taskbar').addEventListener('contextmenu',e=>{e.preventDefault();e.stopPropagation();ctx(e.clientX,e.clientY,[['Task-Manager',()=>launch('Task-Manager')],['Desktop anzeigen',showDesk],['Alle Fenster schließen',closeAll]])});
+
+const R=[['📁','Eigene Dateien',()=>openExplorer(['C:','Eigene Dateien'])],['🖼️','Eigene Bilder',()=>openExplorer(['C:','Eigene Dateien','Bilder'])],['💻','Arbeitsplatz',()=>launch('Explorer')],['⚙️','Systemsteuerung',()=>launch('Systemsteuerung')],['📊','Task-Manager',()=>launch('Task-Manager')],['▶️','Ausführen…',run]];
+function mi(i,t,f,bold){const d=document.createElement('div');d.className='it';d.textContent=i+' '+t;if(bold)d.style.fontWeight='bold';d.onclick=()=>{hideMenu();f()};return d}
+const sep=()=>{const d=document.createElement('div');d.className='sep';return d};
+const PIN=['ZweifachRelaxo','Discord'];
+function buildL(){const m=$('#mL');m.innerHTML='';
+ PIN.forEach(n=>m.appendChild(mi(APPLIST[n][0],n,()=>launch(n),true)));m.appendChild(sep());
+ const u=getUse();Object.keys(u).filter(n=>APPLIST[n]&&!PIN.includes(n)).sort((a,b)=>u[b]-u[a]).slice(0,5).forEach(n=>m.appendChild(mi(APPLIST[n][0],n,()=>launch(n))));
+ m.appendChild(sep());
+ const pr=document.createElement('div');pr.className='it';pr.innerHTML='📂 <b>Alle Programme ▸</b>';const sb=document.createElement('div');sb.className='sub';
+ [['Zubehör › Zeichnen','Zeichnen'],['Zubehör › Rechner','Rechner'],['Zubehör › Editor','Editor'],['Spiele › Minenfeld','Minenfeld'],['Relaxo Browser','Relaxo Browser'],['Explorer','Explorer'],['ZweifachRelaxo','ZweifachRelaxo']].forEach(([t,n])=>{const d=document.createElement('div');d.className='it';d.textContent=t;d.onclick=()=>launch(n);sb.appendChild(d)});
+ pr.appendChild(sb);m.appendChild(pr)}
+R.forEach(a=>$('#mR').appendChild(mi(...a)));
+boot();
+</script></body></html>
