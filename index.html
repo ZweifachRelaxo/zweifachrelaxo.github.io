@@ -54,6 +54,45 @@ iframe{flex:1;border:0;background:#fff;width:100%}textarea{flex:1;border:0;paddi
 table{border-collapse:collapse;width:100%;background:#fff}td,th{padding:3px 6px;border-bottom:1px solid #ddd;text-align:left}tr.sel{background:#316ac5;color:#fff}
 
 .icon{overflow-wrap:anywhere}
+/* Skipe */
+.zrc .c{background:linear-gradient(#3fc07a,#1b7f46)}
+.sk{flex:1;min-height:0;display:flex;background:#f3f6f4;color:#1d2a22;font:13px "Segoe UI",Tahoma,Arial,sans-serif}
+.sk input,.sk select,.sk button{font:inherit}
+.sk-login{margin:auto;width:290px;padding:22px;background:#fff;border:1px solid #cfd9d2;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.12);text-align:center}
+.sk-login h2{margin:0 0 4px;font-size:26px;color:#1b7f46}
+.sk-login p{margin:0 0 14px;color:#5b6b61;font-size:12px}
+.sk-login input{display:block;width:100%;margin:0 0 8px;padding:8px 10px;border:1px solid #b9c7be;border-radius:5px}
+.sk-btn{padding:8px 14px;border:0;border-radius:5px;background:#2e9e5b;color:#fff;font-weight:bold;cursor:pointer}
+.sk-btn:hover{background:#27874e}.sk-btn.alt{background:#e3ece6;color:#1d2a22}.sk-btn.alt:hover{background:#d2dfd6}
+.sk-err{min-height:18px;margin:6px 0;color:#c0392b;font-size:12px}
+.sk-mode{margin-top:10px;font-size:11px;color:#8a6d00;background:#fff6d6;border-radius:4px;padding:4px 6px}
+.sk-main{flex:1;min-width:0;display:none}
+.sk-side{width:230px;flex:none;display:flex;flex-direction:column;background:#e7efe9;border-right:1px solid #cfd9d2}
+.sk-me{padding:10px;display:flex;align-items:center;gap:6px;background:#2e9e5b;color:#fff}
+.sk-me b{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sk-me select{max-width:92px;border:0;border-radius:3px;padding:2px}
+.sk-add{display:flex;gap:4px;padding:8px}
+.sk-add input{flex:1;min-width:0;padding:6px 8px;border:1px solid #b9c7be;border-radius:5px}
+.sk-add button{padding:0 10px}
+.sk-note{padding:0 10px 4px;font-size:11px;color:#c0392b;min-height:14px}
+.sk-list{flex:1;overflow:auto}
+.sk-it{display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;border-bottom:1px solid #d7e2da}
+.sk-it:hover{background:#d8e7dd}.sk-it.on{background:#c6e3d0;font-weight:bold}
+.sk-dot{width:10px;height:10px;border-radius:50%;background:#9aa5a0;flex:none;border:1px solid rgba(0,0,0,.2)}
+.sk-dot.online{background:#2ecc71}.sk-dot.away{background:#f1c40f}.sk-dot.dnd{background:#e74c3c}
+.sk-foot{padding:8px;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#5b6b61;border-top:1px solid #cfd9d2}
+.sk-chat{flex:1;min-width:0;display:flex;flex-direction:column;position:relative}
+.sk-head{padding:12px 16px;font-size:16px;font-weight:bold;background:#fff;border-bottom:1px solid #d7e2da}
+.sk-msgs{flex:1;overflow:auto;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.sk-m{max-width:78%;align-self:flex-start}.sk-m.mine{align-self:flex-end;text-align:right}
+.sk-mt{font-size:11px;color:#6b7b71;margin-bottom:2px}
+.sk-b{display:inline-block;padding:7px 11px;border-radius:12px;background:#fff;border:1px solid #d7e2da;text-align:left;white-space:pre-wrap;word-break:break-word;user-select:text;-webkit-user-select:text}
+.sk-m.mine .sk-b{background:#d9f2e1;border-color:#b6dfc3}
+.sk-inp{display:flex;gap:6px;padding:10px;background:#fff;border-top:1px solid #d7e2da}
+.sk-inp input{flex:1;min-width:0;padding:9px 10px;border:1px solid #b9c7be;border-radius:5px}
+.sk-inp .sk-btn.alt{font-size:16px;padding:4px 10px}
+.sk-emo{display:none;position:absolute;left:10px;bottom:58px;width:230px;padding:6px;background:#fff;border:1px solid #b9c7be;border-radius:8px;box-shadow:0 3px 10px rgba(0,0,0,.2);flex-wrap:wrap}
+.sk-emo span{width:28px;height:28px;text-align:center;font-size:18px;cursor:pointer;border-radius:4px;line-height:28px}.sk-emo span:hover{background:#e3ece6}
 /* Taskleiste, Tray, Ballon */
 #ql{display:flex;align-items:center;gap:2px;padding:0 6px;margin-left:4px;height:30px;border-right:1px solid #1941a5;box-shadow:1px 0 0 rgba(255,255,255,.15)}
 #ql button{width:26px;height:24px;border:1px solid transparent;border-radius:3px;background:transparent;cursor:pointer;font-size:16px;padding:0;line-height:1}
@@ -100,6 +139,7 @@ table{border-collapse:collapse;width:100%;background:#fff}td,th{padding:3px 6px;
 <div class="icons" id="icons"></div>
 <div class="zrcenter">
 <div class="zrc" tabindex="0" onclick="launch('ZweifachRelaxo')" onkeydown="if(event.key==='Enter')launch('ZweifachRelaxo')"><i class="a">⭐</i>ZweifachRelaxo</div>
+<div class="zrc" tabindex="0" onclick="launch('Skipe')" onkeydown="if(event.key==='Enter')launch('Skipe')"><i class="c">🗨️</i>Skipe</div>
 <a class="zrc" href="https://discord.gg/UsHj38S275" target="_blank" rel="noopener noreferrer" onclick="launch('Discord',1)"><i class="b">💬</i>Discord</a>
 </div>
 <div id="menu"><div class="hd">👤 Admin</div><div class="cols"><div class="c1" id="mL"></div><div class="c2" id="mR"></div></div>
@@ -107,6 +147,7 @@ table{border-collapse:collapse;width:100%;background:#fff}td,th{padding:3px 6px;
 <div id="taskbar"><button id="start" onclick="toggleMenu()">start</button>
 <div id="ql">
 <button title="ZweifachRelaxo" onclick="launch('ZweifachRelaxo')">⭐</button>
+<button title="Skipe" onclick="launch('Skipe')">🗨️</button>
 <button title="Discord" onclick="launch('Discord')">💬</button>
 <button title="Relaxo Browser" onclick="launch('Relaxo Browser')">🌐</button>
 <button title="Explorer" onclick="launch('Explorer')">📁</button>
@@ -296,10 +337,150 @@ const APPS={notepad:()=>notepad('Unbenannt',''),editor:()=>notepad('Unbenannt','
 function run(){hideMenu();ask('Geben Sie den Namen eines Programms ein (z. B. notepad, calc, mspaint, winmine, taskmgr, control):','',v=>{v=v.trim().toLowerCase().replace(/\.exe$/,'');APPS[v]?APPS[v]():msg(`RelaxoOS kann '${v}' nicht finden.`,'Ausführen','❌')},'Ausführen')}
 document.addEventListener('keydown',e=>{if(e.ctrlKey&&e.altKey&&e.key==='Delete'&&$('#desktop').style.display==='block'){e.preventDefault();taskmgr()}});
 
+/* ===================== Skipe (Chat) ===================== */
+const CHAT_NAME='Skipe';
+// Firebase-Konfiguration hier eintragen. null = Testmodus (nur im eigenen Browser).
+// Beispiel: const SKIPE_FIREBASE={apiKey:"…",authDomain:"…",projectId:"…",appId:"…"};
+const SKIPE_FIREBASE={apiKey:"AIzaSyCZrcBcLH6bDDJHFVOSygTF_O26grzoESg",authDomain:"relaxo-chat.firebaseapp.com",projectId:"relaxo-chat",storageBucket:"relaxo-chat.firebasestorage.app",messagingSenderId:"853537100133",appId:"1:853537100133:web:1190899f34708d9e39918c"};
+
+const LS={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+async function sha(s){try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('skipe:'+s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}catch(e){return btoa(unescape(encodeURIComponent(s)))}}
+
+/* Backend 1: Testmodus (localStorage, nur dieser Browser) */
+const localBE=(()=>{
+ const subs=new Set(),emit=()=>subs.forEach(f=>f());
+ addEventListener('storage',emit);setInterval(emit,15000);
+ const users=()=>LS.get('sk_users',{});
+ const sess=()=>{try{return JSON.parse(sessionStorage.getItem('sk_session'))}catch(e){return null}};
+ const setSess=v=>{try{v?sessionStorage.setItem('sk_session',JSON.stringify(v)):sessionStorage.removeItem('sk_session')}catch(e){}};
+ const mkey=t=>'sk_m_'+t.kind+'_'+t.id;
+ const touch=(uid,st)=>{const u=users();if(u[uid]){u[uid].status=st||u[uid].status||'online';u[uid].last=Date.now();LS.set('sk_users',u);emit()}};
+ return {
+  mode:'Testmodus: Konten und Nachrichten existieren nur in diesem Browser.',
+  async init(cb){cb(sess())},
+  async register(name,pw){const l=name.toLowerCase(),u=users();if(u[l])throw new Error('Benutzername bereits vergeben.');u[l]={name,hash:await sha(pw),status:'online',last:Date.now()};LS.set('sk_users',u);const s={uid:l,name};setSess(s);emit();return s},
+  async login(name,pw){const l=name.toLowerCase(),u=users()[l];if(!u||u.hash!==await sha(pw))throw new Error('Benutzername oder Passwort falsch.');const s={uid:l,name:u.name};setSess(s);touch(l,'online');return s},
+  async logout(){setSess(null)},
+  async setStatus(me,st){touch(me.uid,st)},
+  async findUser(name){const l=name.toLowerCase(),u=users()[l];return u?{uid:l,name:u.name}:null},
+  async openChat(me,o){const id=[me.uid,o.uid].sort().join('|'),c=LS.get('sk_chats',{});if(!c[id]){c[id]={members:[me.uid,o.uid],names:{[me.uid]:me.name,[o.uid]:o.name}};LS.set('sk_chats',c);emit()}return id},
+  watchChats(uid,cb){const f=()=>{const c=LS.get('sk_chats',{});cb(Object.entries(c).filter(([id,x])=>x.members.includes(uid)).map(([id,x])=>{const o=x.members.find(m=>m!==uid);return{id,uid:o,name:x.names[o]}}))};subs.add(f);f();return()=>subs.delete(f)},
+  watchPresence(uid,cb){const f=()=>{const u=users()[uid];cb(u?u.status:'offline',u?u.last:0)};subs.add(f);f();return()=>subs.delete(f)},
+  watchMessages(t,cb){const k=mkey(t);if(t.kind==='room'&&!LS.get(k,null))LS.set(k,[{uid:'bot',name:'Skipe-Bot',text:'Willkommen im Allgemeinen Chat! 👋',ts:Date.now()}]);const f=()=>cb(LS.get(k,[]));subs.add(f);f();return()=>subs.delete(f)},
+  async send(me,t,text){const k=mkey(t),a=LS.get(k,[]);a.push({uid:me.uid,name:me.name,text,ts:Date.now()});LS.set(k,a.slice(-200));emit()}
+ }})();
+
+/* Backend 2: Firebase (echter Online-Chat) */
+async function fbBE(cfg){
+ const B='https://www.gstatic.com/firebasejs/10.12.2/';
+ const [A,Au,Fs]=await Promise.all([import(B+'firebase-app.js'),import(B+'firebase-auth.js'),import(B+'firebase-firestore.js')]);
+ const app=A.initializeApp(cfg),auth=Au.getAuth(app),db=Fs.getFirestore(app);
+ const mail=n=>n.toLowerCase()+'@skipe.chat';
+ const ERR={'auth/email-already-in-use':'Benutzername bereits vergeben.','auth/invalid-credential':'Benutzername oder Passwort falsch.','auth/wrong-password':'Benutzername oder Passwort falsch.','auth/user-not-found':'Benutzername oder Passwort falsch.','auth/invalid-login-credentials':'Benutzername oder Passwort falsch.','auth/weak-password':'Passwort zu schwach (mind. 6 Zeichen).','auth/too-many-requests':'Zu viele Versuche. Bitte später erneut versuchen.','auth/operation-not-allowed':'Anmeldung per E-Mail/Passwort ist in Firebase nicht aktiviert.'};
+ const fe=e=>new Error(ERR[e.code]||('Fehler: '+(e.code||e.message)));
+ const prof=async u=>{const d=await Fs.getDoc(Fs.doc(db,'users',u.uid));return{uid:u.uid,name:d.exists()?d.data().name:(u.displayName||'Benutzer')}};
+ let busy=false;
+ const roomRef=t=>t.kind==='room'?Fs.collection(db,'rooms',t.id,'messages'):Fs.collection(db,'chats',t.id,'messages');
+ return {
+  mode:'',
+  init(cb){Au.onAuthStateChanged(auth,async u=>{if(busy)return;cb(u?await prof(u):null)})},
+  async register(name,pw){busy=true;try{const c=await Au.createUserWithEmailAndPassword(auth,mail(name),pw);await Fs.setDoc(Fs.doc(db,'users',c.user.uid),{name,nameLower:name.toLowerCase(),status:'online',last:Date.now()});return{uid:c.user.uid,name}}catch(e){throw fe(e)}finally{busy=false}},
+  async login(name,pw){try{const c=await Au.signInWithEmailAndPassword(auth,mail(name),pw);return await prof(c.user)}catch(e){throw fe(e)}},
+  async logout(){await Au.signOut(auth)},
+  async setStatus(me,st){await Fs.setDoc(Fs.doc(db,'users',me.uid),{status:st,last:Date.now()},{merge:true})},
+  async findUser(name){const r=await Fs.getDocs(Fs.query(Fs.collection(db,'users'),Fs.where('nameLower','==',name.toLowerCase()),Fs.limit(1)));return r.empty?null:{uid:r.docs[0].id,name:r.docs[0].data().name}},
+  async openChat(me,o){const id=[me.uid,o.uid].sort().join('_');await Fs.setDoc(Fs.doc(db,'chats',id),{members:[me.uid,o.uid],names:{[me.uid]:me.name,[o.uid]:o.name}},{merge:true});return id},
+  watchChats(uid,cb){return Fs.onSnapshot(Fs.query(Fs.collection(db,'chats'),Fs.where('members','array-contains',uid)),s=>cb(s.docs.map(d=>{const c=d.data(),o=c.members.find(x=>x!==uid);return{id:d.id,uid:o,name:c.names[o]}})))},
+  watchPresence(uid,cb){return Fs.onSnapshot(Fs.doc(db,'users',uid),d=>{const x=d.data()||{};cb(x.status||'offline',x.last||0)})},
+  watchMessages(t,cb){return Fs.onSnapshot(Fs.query(roomRef(t),Fs.orderBy('ts','desc'),Fs.limit(100)),s=>cb(s.docs.map(d=>{const x=d.data();return{uid:x.uid,name:x.name,text:x.text,ts:x.ts?x.ts.toMillis():Date.now()}}).reverse()))},
+  async send(me,t,text){await Fs.addDoc(roomRef(t),{uid:me.uid,name:me.name,text,ts:Fs.serverTimestamp()})}
+ }}
+
+let SKBE=null;
+async function getBE(){if(!SKBE)SKBE=SKIPE_FIREBASE?await fbBE(SKIPE_FIREBASE):localBE;return SKBE}
+
+function skipe(){
+ const ex=document.querySelector('.win[data-sk]');if(ex){ex.dispatchEvent(new Event('mousedown'));return}
+ const W=Math.min(860,Math.round(innerWidth*.94)),H=Math.min(560,Math.round(innerHeight-30-16));
+ const b=createWindow(CHAT_NAME,'🗨️',W,H);b.win.dataset.sk='1';
+ b.win.style.left=Math.max(0,Math.round((innerWidth-W)/2)+24)+'px';b.win.style.top=Math.max(0,Math.round((innerHeight-30-H)/2)+14)+'px';
+ b.innerHTML=`<div class="sk">
+ <div class="sk-login"><h2>Skipe</h2><p>Melde dich an, um zu chatten.</p>
+  <input class="sk-u" placeholder="Benutzername" maxlength="20" autocomplete="username"><input class="sk-p" type="password" placeholder="Passwort" autocomplete="current-password">
+  <div class="sk-err"></div><div style="display:flex;gap:8px;justify-content:center"><button class="sk-btn sk-li">Anmelden</button><button class="sk-btn alt sk-rg">Konto erstellen</button></div><div class="sk-mode" style="display:none"></div></div>
+ <div class="sk-main">
+  <div class="sk-side"><div class="sk-me"><span class="sk-dot online sk-mydot"></span><b class="sk-myname"></b>
+   <select class="sk-stat"><option value="online">Online</option><option value="away">Abwesend</option><option value="dnd">Nicht stören</option><option value="offline">Unsichtbar</option></select></div>
+   <div class="sk-add"><input class="sk-an" placeholder="Benutzer hinzufügen…" maxlength="20"><button class="sk-btn sk-ab" title="Hinzufügen">＋</button></div><div class="sk-note"></div>
+   <div class="sk-list"></div><div class="sk-foot"><span class="sk-md"></span><button class="sk-btn alt sk-lo">Abmelden</button></div></div>
+  <div class="sk-chat"><div class="sk-head"></div><div class="sk-msgs"></div><div class="sk-emo"></div>
+   <div class="sk-inp"><button class="sk-btn alt sk-eb" title="Emoticons">🙂</button><input class="sk-mi" placeholder="Nachricht schreiben…" maxlength="500"><button class="sk-btn sk-sb">Senden</button></div></div>
+ </div></div>`;
+ const q=x=>b.querySelector(x),root=q('.sk');
+ let be=null,me=null,cur=null,chats=[],pres={},presUn={},unsubs=[],msgUn=null,hb=null,lastSend=0,lastCount=-1;
+ const eff=p=>(!p||p.s==='offline'||Date.now()-p.l>150000)?'offline':p.s;
+ const hhmm=t=>new Date(t).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
+ function cleanup(){unsubs.forEach(f=>{try{f()}catch(e){}});unsubs=[];Object.values(presUn).forEach(f=>{try{f()}catch(e){}});presUn={};pres={};if(msgUn){try{msgUn()}catch(e){}msgUn=null}clearInterval(hb);me=null;cur=null;chats=[]}
+ function showLogin(err){cleanup();q('.sk-main').style.display='none';q('.sk-login').style.display='block';q('.sk-err').textContent=err||''}
+ function renderList(){
+  const L=q('.sk-list');L.innerHTML='';
+  const items=[{kind:'room',id:'general',name:'Allgemeiner Chat',room:true}].concat(chats.map(c=>({kind:'chat',id:c.id,name:c.name,uid:c.uid})).sort((a,b)=>a.name.localeCompare(b.name)));
+  items.forEach(t=>{const d=document.createElement('div');d.className='sk-it'+(cur&&cur.kind===t.kind&&cur.id===t.id?' on':'');
+   const dot=document.createElement('span');dot.className='sk-dot '+(t.room?'online':eff(pres[t.uid]));const n=document.createElement('span');n.textContent=(t.room?'👥 ':'')+t.name;
+   d.append(dot,n);d.onclick=()=>openT(t);L.appendChild(d)});
+ }
+ function syncPresence(){chats.forEach(c=>{if(!presUn[c.uid])presUn[c.uid]=be.watchPresence(c.uid,(s,l)=>{pres[c.uid]={s,l};renderList()})})}
+ function renderMsgs(list){
+  const M=q('.sk-msgs'),first=lastCount<0;M.innerHTML='';
+  list.forEach(m=>{const d=document.createElement('div');d.className='sk-m'+(me&&m.uid===me.uid?' mine':'');
+   const h=document.createElement('div');h.className='sk-mt';h.textContent=m.name+' · '+hhmm(m.ts);const bb=document.createElement('div');bb.className='sk-b';bb.textContent=m.text;d.append(h,bb);M.appendChild(d)});
+  M.scrollTop=M.scrollHeight;
+  const last=list[list.length-1];if(!first&&list.length>lastCount&&last&&me&&last.uid!==me.uid)tone(740,0,.15,.08);
+  lastCount=list.length;
+ }
+ function openT(t){cur=t;lastCount=-1;q('.sk-head').textContent=(t.kind==='room'?'👥 ':'')+t.name;renderList();if(msgUn){try{msgUn()}catch(e){}}msgUn=be.watchMessages(t,renderMsgs);q('.sk-mi').focus()}
+ function start(u){
+  if(me&&me.uid===u.uid)return;cleanup();me=u;
+  q('.sk-login').style.display='none';q('.sk-main').style.display='flex';q('.sk-myname').textContent=u.name;q('.sk-stat').value='online';q('.sk-note').textContent='';
+  q('.sk-md').textContent=be.mode?'Testmodus':'';q('.sk-md').title=be.mode;
+  unsubs.push(be.watchChats(u.uid,l=>{chats=l;syncPresence();renderList()}));
+  be.setStatus(me,'online');
+  hb=setInterval(()=>{if(!root.isConnected){cleanup();return}be.setStatus(me,q('.sk-stat').value);renderList()},60000);
+  openT({kind:'room',id:'general',name:'Allgemeiner Chat'});
+ }
+ async function auth(kind){
+  const name=q('.sk-u').value.trim(),pw=q('.sk-p').value,err=q('.sk-err');err.textContent='';
+  if(!/^[A-Za-z0-9_.-]{3,20}$/.test(name)){err.textContent='Benutzername: 3–20 Zeichen (Buchstaben, Zahlen, _ . -).';return}
+  if(pw.length<6){err.textContent='Das Passwort braucht mindestens 6 Zeichen.';return}
+  try{const u=kind==='reg'?await be.register(name,pw):await be.login(name,pw);q('.sk-p').value='';start(u)}catch(e){err.textContent=e.message}
+ }
+ async function send(){
+  const i=q('.sk-mi'),text=i.value.trim();if(!text||!me||!cur)return;
+  if(Date.now()-lastSend<800)return;lastSend=Date.now();i.value='';
+  try{await be.send(me,cur,text.slice(0,500))}catch(e){q('.sk-note').textContent='Senden fehlgeschlagen.'}
+ }
+ async function addUser(){
+  const i=q('.sk-an'),n=i.value.trim(),note=q('.sk-note');note.textContent='';if(!n)return;
+  if(n.toLowerCase()===me.name.toLowerCase()){note.textContent='Das bist du selbst.';return}
+  try{const u=await be.findUser(n);if(!u){note.textContent='Benutzer nicht gefunden.';return}const id=await be.openChat(me,u);i.value='';openT({kind:'chat',id,name:u.name,uid:u.uid})}catch(e){note.textContent='Hinzufügen fehlgeschlagen.'}
+ }
+ q('.sk-li').onclick=()=>auth('login');q('.sk-rg').onclick=()=>auth('reg');
+ [q('.sk-u'),q('.sk-p')].forEach(i=>i.addEventListener('keydown',e=>{if(e.key==='Enter')auth('login')}));
+ q('.sk-sb').onclick=send;q('.sk-mi').addEventListener('keydown',e=>{if(e.key==='Enter')send()});
+ q('.sk-ab').onclick=addUser;q('.sk-an').addEventListener('keydown',e=>{if(e.key==='Enter')addUser()});
+ q('.sk-stat').onchange=()=>{if(me){be.setStatus(me,q('.sk-stat').value);q('.sk-mydot').className='sk-dot sk-mydot '+q('.sk-stat').value}};
+ q('.sk-lo').onclick=async()=>{try{await be.logout()}catch(e){}showLogin()};
+ const emo=q('.sk-emo');'😀 😁 😂 😊 😍 😎 😢 😡 👍 👎 👋 🎉 ❤️ 🔥 ⭐ ✅ 😴 🤔 🙈 💪'.split(' ').forEach(e=>{const s=document.createElement('span');s.textContent=e;s.onclick=()=>{const i=q('.sk-mi');i.value+=e;i.focus();emo.style.display='none'};emo.appendChild(s)});
+ q('.sk-eb').onclick=()=>{emo.style.display=emo.style.display==='flex'?'none':'flex'};
+ getBE().then(x=>{be=x;if(be.mode){const m=q('.sk-mode');m.style.display='block';m.textContent=be.mode}be.init(u=>{if(u)start(u);else showLogin()})})
+  .catch(()=>{q('.sk-err').textContent='Verbindung zum Chat-Dienst fehlgeschlagen.'});
+}
+
 /* Programme, Nutzung, Startmenü */
 const DISCORD='https://discord.gg/UsHj38S275';
 const APPLIST={
  'ZweifachRelaxo':['⭐',()=>openZR()],
+ 'Skipe':['🗨️',()=>skipe()],
  'Discord':['💬',()=>open(DISCORD,'_blank','noopener')],
  'Relaxo Browser':['🌐',()=>browser()],
  'Editor':['📝',()=>notepad('Unbenannt','')],
@@ -319,14 +500,15 @@ $('#taskbar').addEventListener('contextmenu',e=>{e.preventDefault();e.stopPropag
 const R=[['📁','Eigene Dateien',()=>openExplorer(['C:','Eigene Dateien'])],['🖼️','Eigene Bilder',()=>openExplorer(['C:','Eigene Dateien','Bilder'])],['💻','Arbeitsplatz',()=>launch('Explorer')],['⚙️','Systemsteuerung',()=>launch('Systemsteuerung')],['📊','Task-Manager',()=>launch('Task-Manager')],['▶️','Ausführen…',run]];
 function mi(i,t,f,bold){const d=document.createElement('div');d.className='it';d.textContent=i+' '+t;if(bold)d.style.fontWeight='bold';d.onclick=()=>{hideMenu();f()};return d}
 const sep=()=>{const d=document.createElement('div');d.className='sep';return d};
-const PIN=['ZweifachRelaxo','Discord'];
+const PIN=['ZweifachRelaxo','Skipe','Discord'];
 function buildL(){const m=$('#mL');m.innerHTML='';
  PIN.forEach(n=>m.appendChild(mi(APPLIST[n][0],n,()=>launch(n),true)));m.appendChild(sep());
  const u=getUse();Object.keys(u).filter(n=>APPLIST[n]&&!PIN.includes(n)).sort((a,b)=>u[b]-u[a]).slice(0,5).forEach(n=>m.appendChild(mi(APPLIST[n][0],n,()=>launch(n))));
  m.appendChild(sep());
  const pr=document.createElement('div');pr.className='it';pr.innerHTML='📂 <b>Alle Programme ▸</b>';const sb=document.createElement('div');sb.className='sub';
- [['Zubehör › Zeichnen','Zeichnen'],['Zubehör › Rechner','Rechner'],['Zubehör › Editor','Editor'],['Spiele › Minenfeld','Minenfeld'],['Relaxo Browser','Relaxo Browser'],['Explorer','Explorer'],['ZweifachRelaxo','ZweifachRelaxo']].forEach(([t,n])=>{const d=document.createElement('div');d.className='it';d.textContent=t;d.onclick=()=>launch(n);sb.appendChild(d)});
+ [['Zubehör › Zeichnen','Zeichnen'],['Zubehör › Rechner','Rechner'],['Zubehör › Editor','Editor'],['Spiele › Minenfeld','Minenfeld'],['Relaxo Browser','Relaxo Browser'],['Explorer','Explorer'],['ZweifachRelaxo','ZweifachRelaxo'],['Skipe','Skipe']].forEach(([t,n])=>{const d=document.createElement('div');d.className='it';d.textContent=t;d.onclick=()=>launch(n);sb.appendChild(d)});
  pr.appendChild(sb);m.appendChild(pr)}
 R.forEach(a=>$('#mR').appendChild(mi(...a)));
 boot();
 </script></body></html>
+
