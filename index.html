@@ -98,18 +98,6 @@ body{font:11px Tahoma,Verdana,"Segoe UI",sans-serif}
 ::-webkit-scrollbar-thumb{background:linear-gradient(90deg,#c1d3fb,#a3bcf5 50%,#c1d3fb);border:1px solid #7f9ef0;border-radius:3px}
 ::-webkit-scrollbar-corner{background:#ece9d8}
 /* Hochfahren */
-#bios{background:#000;align-items:flex-start;justify-content:flex-start;font:16px/1.3 "Lucida Console","Courier New",monospace;color:#c4c4c4;padding:20px 26px;overflow:hidden}
-#biosTxt{margin:0;white-space:pre;font:inherit}
-#biosHint{position:absolute;left:26px;bottom:18px;color:#9a9a9a;font:14px "Courier New",monospace}
-#biosHint u{cursor:pointer;color:#fff}
-#setup{background:#0000a8;align-items:stretch;justify-content:stretch;padding:14px;font:15px/1.4 "Lucida Console","Courier New",monospace;color:#fff}
-.su{flex:1;display:flex;flex-direction:column;border:2px solid #ccc;min-height:0}
-.sut{background:#a8a8a8;color:#000;text-align:center;font-weight:bold;padding:2px}
-.sutabs{display:flex;background:#a8a8a8;color:#000;border-top:1px solid #000}.sutabs span{padding:3px 18px;cursor:pointer}.sutabs span.on{background:#0000a8;color:#fff}
-.sumain{flex:1;display:flex;min-height:0}
-.sulist{flex:1;padding:14px 18px}.sur{display:grid;grid-template-columns:270px 1fr;padding:1px 6px;cursor:pointer}.sur.on{background:#a8a8a8;color:#000}
-.suhelp{width:34%;border-left:2px solid #ccc;padding:14px;color:#55ffff}
-.sufoot{background:#a8a8a8;color:#000;padding:3px 8px;font-size:13px}.sufoot span{cursor:pointer;text-decoration:underline}
 #boot{background:#000;flex-direction:column}
 .bl{display:flex;align-items:flex-start;gap:4px;color:#fff;font:italic bold 58px "Franklin Gothic Medium","Trebuchet MS",sans-serif;letter-spacing:-1px}
 .bl small{font:italic bold 24px "Trebuchet MS",sans-serif;color:#ff6a1a;margin-top:6px}
@@ -205,8 +193,6 @@ body{font:11px Tahoma,Verdana,"Segoe UI",sans-serif}
 
 </style></head><body>
 
-<div id="bios" class="scr"><pre id="biosTxt"></pre><div id="biosHint" onpointerdown="event.stopPropagation()">Drücke <u onclick="delKey=true">ENTF</u> für SETUP · Leertaste / Klick: überspringen</div></div>
-<div id="setup" class="scr"><div class="su"><div class="sut">RelaxoBIOS Setup Utility – v6.00PG</div><div class="sutabs"></div><div class="sumain"><div class="sulist"></div><div class="suhelp"></div></div><div class="sufoot">←→ Seite · ↑↓ Auswahl · Enter · F10 Speichern &amp; Beenden · <span>ESC Beenden</span></div></div></div>
 <div id="boot" class="scr"><div class="bl">Relaxo<small>OS</small></div><div class="xpb"><i></i></div><div class="bc">Copyright © 2026 Relaxo</div><div class="bm">Relaxo OS</div><div class="bskip">Klick: überspringen</div></div>
 <div id="welcome" class="scr"><div class="wl">Relaxo<small>OS</small></div><div class="wr">Willkommen</div></div>
 <div id="logoff" class="scr">RelaxoOS wird abgemeldet …</div>
@@ -235,70 +221,14 @@ const $=s=>document.querySelector(s),sleep=ms=>new Promise(r=>setTimeout(r,ms));
 let AC;function tone(f,t,d,v=.15){try{AC=AC||new AudioContext();if(AC.state==='suspended')AC.resume();const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=f;o.type='sine';g.gain.setValueAtTime(v,AC.currentTime+t);g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+t+d);o.connect(g);g.connect(AC.destination);o.start(AC.currentTime+t);o.stop(AC.currentTime+t+d)}catch(e){}}
 function chime(){[[523,0],[659,.25],[784,.5],[1047,.8]].forEach(([f,t])=>tone(f,t,1))}function beep(){tone(880,0,.2)}
 function show(id){document.querySelectorAll('.scr').forEach(s=>s.style.display='none');$('#desktop').style.display='none';if(id)$('#'+id).style.display='flex'}
-/* ===== Hochfahren: BIOS → Start → Willkommen (kein Login) ===== */
-let bootId=0,skipBoot=false,delKey=false;
-document.addEventListener('keydown',e=>{if($('#bios').style.display==='flex'){if(e.key==='Delete'){delKey=true;e.preventDefault()}else if(e.key===' '){skipBoot=true;e.preventDefault()}}});
-['bios','boot','welcome'].forEach(i=>$('#'+i).addEventListener('pointerdown',()=>{skipBoot=true}));
-const SU={
- Main:[['System Time','[%T]'],['System Date','[%D]'],['Primary Master','[RELAXO HDD 80GB]'],['Primary Slave','[Not Detected]'],['Secondary Master','[RELAXO DVD-ROM 52X]'],['Installed Memory','512 MB']],
- Advanced:[['CPU Frequency','3000 MHz'],['Hyper-Threading','[Enabled]'],['Virtualization','[Disabled]'],['USB Legacy Support','[Enabled]'],['Onboard LAN','[Enabled]'],['Onboard Audio','[Enabled]']],
- Boot:[['1st Boot Device','[Hard Disk]'],['2nd Boot Device','[CD/DVD-ROM]'],['3rd Boot Device','[Disabled]'],['Quick Boot','[Disabled]'],['Boot Logo','[Relaxo]']],
- Exit:[['Save Changes and Exit','',1],['Discard Changes and Exit','',1],['Load Setup Defaults','',1]]
-};
-const SUHELP={Main:'Zeit, Datum und Laufwerke des Systems.',Advanced:'Erweiterte Chipsatz- und Geräteeinstellungen. Nichts ändern, wenn Sie sich nicht sicher sind.',Boot:'Reihenfolge der Startgeräte.',Exit:'Setup beenden und mit dem Start fortfahren.'};
-function runSetup(){return new Promise(res=>{
- show('setup');const tabs=Object.keys(SU);let tab='Main',selI=0;
- const done=()=>{document.removeEventListener('keydown',kd);res()};
- function draw(){
-  const d=new Date(),T=$('#setup .sutabs'),L=$('#setup .sulist');T.innerHTML='';L.innerHTML='';
-  tabs.forEach(t=>{const e=document.createElement('span');e.textContent=t;if(t===tab)e.className='on';e.onclick=()=>{tab=t;selI=0;draw()};T.appendChild(e)});
-  SU[tab].forEach(([a,b,ex],i)=>{const r=document.createElement('div');r.className='sur'+(i===selI?' on':'');r.innerHTML='<span></span><span></span>';r.children[0].textContent=a;r.children[1].textContent=b.replace('%T',d.toLocaleTimeString('de-DE')).replace('%D',d.toLocaleDateString('de-DE'));r.onclick=()=>{selI=i;if(ex)done();else draw()};L.appendChild(r)});
-  $('#setup .suhelp').textContent=SUHELP[tab]}
- const kd=e=>{if(e.key==='Escape'||e.key==='F10'){e.preventDefault();done()}
-  else if(e.key==='ArrowRight'){tab=tabs[(tabs.indexOf(tab)+1)%tabs.length];selI=0;draw()}
-  else if(e.key==='ArrowLeft'){tab=tabs[(tabs.indexOf(tab)+tabs.length-1)%tabs.length];selI=0;draw()}
-  else if(e.key==='ArrowDown'){selI=(selI+1)%SU[tab].length;draw()}
-  else if(e.key==='ArrowUp'){selI=(selI+SU[tab].length-1)%SU[tab].length;draw()}
-  else if(e.key==='Enter'&&SU[tab][selI][2])done()};
- document.addEventListener('keydown',kd);$('#setup .sufoot span').onclick=done;draw()})}
+/* ===== Hochfahren: Start → Willkommen (kein Login) ===== */
+let bootId=0,skipBoot=false;
+['boot','welcome'].forEach(i=>$('#'+i).addEventListener('pointerdown',()=>{skipBoot=true}));
 async function boot(){
- const id=++bootId;skipBoot=false;delKey=false;
+ const id=++bootId;skipBoot=false;
  const wait=async ms=>{const e=Date.now()+ms;while(Date.now()<e&&!skipBoot&&id===bootId)await sleep(30)};
- show('bios');const T=$('#biosTxt');let L=[];const out=()=>{T.textContent=L.join('\n')};
- const add=async(x,ms=60)=>{L.push(x);out();await wait(ms)};
- const det=async(a,b,ms)=>{L.push(a);out();await wait(ms);L[L.length-1]=a+b;out();await wait(80)};
- tone(1000,0,.14,.1);
- await add('RelaxoBIOS v6.00PG, Relaxo Technologies Ltd.',140);
- await add('Copyright (C) 1998-2003, Relaxo Software, Inc.',60);
- await add('');
- await add('RELAXO-i865PE ACPI BIOS Revision 1005',100);
- await add('');
- await add('CPU  : Relaxo Core(tm) 3.00GHz',80);
- await add('Speed: 3.00 GHz        Count: 1',100);
- await add('');
- L.push('Memory Test : 0K');const mi=L.length-1;
- for(let k=0;k<=524288&&!skipBoot&&id===bootId;k+=16384){L[mi]='Memory Test : '+k+'K';out();await wait(38)}
- L[mi]='Memory Test : 524288K OK';out();await wait(250);
- await add('');
- await add('Relaxo Plug and Play BIOS Extension v1.0A',100);
- await add('Initialize Plug and Play Cards...',150);
- await add('PNP Init Completed',250);
- await add('');
- await det('Detecting Primary Master   ... ','RELAXO HDD 80GB',380);
- await det('Detecting Primary Slave    ... ','None',280);
- await det('Detecting Secondary Master ... ','RELAXO DVD-ROM 52X',380);
- await det('Detecting Secondary Slave  ... ','None',280);
- await add('');
- await add('Press DEL to enter SETUP, SPACE to skip',50);
- for(let i=0;i<14&&!delKey&&!skipBoot&&id===bootId;i++)await sleep(100);
- if(id!==bootId)return;
- if(delKey){delKey=false;await runSetup();if(id!==bootId)return;show('bios')}
- await add('');
- await add('Verifying DMI Pool Data ........',700);
- await add('Boot from Hard Disk ... OK',500);
- if(id!==bootId)return;
- show('boot');await wait(3800);if(skipBoot)await sleep(450);if(id!==bootId)return;
- show('welcome');await wait(1900);if(skipBoot)await sleep(350);if(id!==bootId)return;
+ show('boot');await wait(3800);if(skipBoot)await sleep(300);if(id!==bootId)return;
+ show('welcome');await wait(1900);if(skipBoot)await sleep(300);if(id!==bootId)return;
  startDesktop()}
 function startDesktop(){show();$('#desktop').style.display='block';chime();loadBg();setTimeout(()=>{if($('#desktop').style.display==='block')balloon('Willkommen bei RelaxoOS','Ihr Computer ist geschützt.',()=>{})},1500)}
 document.addEventListener('pointerdown',()=>{try{AC=AC||new AudioContext();if(AC.state==='suspended')AC.resume()}catch(e){}},{once:true});
@@ -346,7 +276,7 @@ function mk(p,k,o){getDir(p).c[k]=o;save()}
 function openItem(p,k){const o=getDir(p).c[k];if(o.t==='d')openExplorer([...p,k]);else if(/\.(png|jpg|jpeg|gif)$/i.test(k)&&o.x.startsWith('data:'))viewImg(k,o.x);else notepad(k,o.x,o)}
 function viewImg(k,src){const b=createWindow(k,'🖼️',500,380);b.innerHTML=`<img src="${src}" style="max-width:100%;max-height:100%;margin:auto">`}
 function drawIcons(){const c=$('#icons');c.innerHTML='';
- const base=[['💻','Arbeitsplatz',()=>openExplorer([])],['📁','Eigene Dateien',()=>openExplorer(['C:','Eigene Dateien'])],['🌐','Relaxo Browser',()=>launch('Relaxo Browser')],['🗨️','Skipe',()=>launch('Skipe')],['📞','Anrufliste',()=>launch('Anrufliste')],['📝','Editor',()=>launch('Editor')],['🗑️','Papierkorb',()=>msg('Der Papierkorb ist leer.')]];
+ const base=[['💻','Arbeitsplatz',()=>openExplorer([])],['📁','Eigene Dateien',()=>openExplorer(['C:','Eigene Dateien'])],['🌐','Relaxo Browser',()=>launch('Relaxo Browser')],['🗨️','Skipe',()=>launch('Skipe')],['📞','Anrufliste',()=>launch('Anrufliste')],['🎮','Spiele',()=>launch('Spiele')],['📝','Editor',()=>launch('Editor')],['🗑️','Papierkorb',()=>msg('Der Papierkorb ist leer.')]];
  base.forEach(([i,t,f])=>addIcon(c,i,t,f));
  Object.entries(getDir(DESK).c).forEach(([k,o])=>addIcon(c,o.t==='d'?'📁':'📄',k,()=>openItem(DESK,k),k))}
 function addIcon(c,i,t,f,k){const d=document.createElement('div');d.className='icon';d.innerHTML=`<b>${i}</b><span></span>`;d.lastChild.textContent=t;d.onmousedown=e=>{document.querySelectorAll('.icon').forEach(x=>x.classList.remove('sel'));d.classList.add('sel')};d.ondblclick=f;
@@ -468,7 +398,7 @@ function loadBg(){const v=localStorage.getItem('rxbg2');$('#desktop').style.back
 function openDisplay(){const b=createWindow('Eigenschaften von Anzeige','🖥️',320,260);b.className+=' dlg';b.innerHTML=`<div style="font-size:13px">Desktophintergrund:</div><div class="r" style="flex-wrap:wrap"></div>`;
  Object.entries(BGS).forEach(([k,v])=>{const x=document.createElement('button');x.textContent=k;x.onclick=()=>{$('#desktop').style.background=v||WALL;try{localStorage.setItem('rxbg2',v)}catch(e){}};b.querySelector('.r').appendChild(x)})}
 function control(){const b=createWindow('Systemsteuerung','⚙️',420,280);b.innerHTML=`<div class="files"></div>`;[['🖥️','Anzeige',openDisplay],['💻','System',sysinfo],['📊','Task-Manager',taskmgr],['🕐','Datum/Uhrzeit',()=>msg(new Date().toLocaleString('de-DE'),'Datum und Uhrzeit','🕐')]].forEach(([i,t,f])=>{const e=document.createElement('div');e.className='f';e.innerHTML=`<b>${i}</b>${t}`;e.ondblclick=f;b.firstChild.appendChild(e)})}
-const APPS={notepad:()=>notepad('Unbenannt',''),editor:()=>notepad('Unbenannt',''),calc:calc,rechner:calc,mspaint:paint,paint:paint,iexplore:browser,explorer:()=>openExplorer([]),winmine:mines,taskmgr:taskmgr,control:control,bluescreen:bluescreen,cmd:()=>msg('Die Eingabeaufforderung ist in dieser Version nicht verfügbar.','cmd')};
+const APPS={snake:snake,spiele:spiele,'2048':game2048,memory:memory,tictactoe:tictactoe,notepad:()=>notepad('Unbenannt',''),editor:()=>notepad('Unbenannt',''),calc:calc,rechner:calc,mspaint:paint,paint:paint,iexplore:browser,explorer:()=>openExplorer([]),winmine:mines,taskmgr:taskmgr,control:control,bluescreen:bluescreen,cmd:()=>msg('Die Eingabeaufforderung ist in dieser Version nicht verfügbar.','cmd')};
 function run(){hideMenu();ask('Geben Sie den Namen eines Programms ein (z. B. notepad, calc, mspaint, winmine, taskmgr, control):','',v=>{v=v.trim().toLowerCase().replace(/\.exe$/,'');APPS[v]?APPS[v]():msg(`RelaxoOS kann '${v}' nicht finden.`,'Ausführen','❌')},'Ausführen')}
 document.addEventListener('keydown',e=>{if(e.ctrlKey&&e.altKey&&e.key==='Delete'&&$('#desktop').style.display==='block'){e.preventDefault();taskmgr()}});
 
@@ -501,6 +431,82 @@ function panic(){
  o.querySelector('.an-cn').addEventListener('pointerdown',()=>{const t=Date.now();clicks=clicks.filter(x=>t-x<2500);clicks.push(t);if(clicks.length>=5)exit()});
  o.addEventListener('contextmenu',e=>e.preventDefault());document.addEventListener('keydown',key,true)}
 
+/* ===================== Spiele ===================== */
+function spiele(){
+ const b=createWindow('Spiele','🎮',440,300);b.innerHTML='<div class="files"></div>';const f=b.firstChild;
+ [['💣','Minenfeld'],['🐍','Snake'],['🔢','2048'],['🃏','Memory'],['❌','Tic-Tac-Toe']].forEach(([i,n])=>{const e=document.createElement('div');e.className='f';e.style.cursor='pointer';e.innerHTML='<b>'+i+'</b>'+n;e.onclick=()=>launch(n);f.appendChild(e)})}
+const keyDir={ArrowUp:[0,-1],w:[0,-1],W:[0,-1],ArrowDown:[0,1],s:[0,1],S:[0,1],ArrowLeft:[-1,0],a:[-1,0],A:[-1,0],ArrowRight:[1,0],d:[1,0],D:[1,0]};
+function swipe(el,cb){let tx,ty;el.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY},{passive:true});el.addEventListener('touchend',e=>{const t=e.changedTouches[0],dx=t.clientX-tx,dy=t.clientY-ty;if(Math.max(Math.abs(dx),Math.abs(dy))<20)return;Math.abs(dx)>Math.abs(dy)?cb(dx>0?1:-1,0):cb(0,dy>0?1:-1)})}
+function gameKeys(b,cb,extra){const kd=e=>{if(!document.body.contains(b)){document.removeEventListener('keydown',kd);return}if(!b.win.classList.contains('act'))return;const m=keyDir[e.key];if(m){e.preventDefault();cb(m[0],m[1])}else if(extra&&extra(e)){e.preventDefault()}};document.addEventListener('keydown',kd)}
+
+function snake(){
+ const b=createWindow('Snake','🐍',384,470);b.win.style.resize='none';
+ b.innerHTML=`<div class="bar"><span class="sc">Punkte: 0</span><span style="flex:1"></span><span class="hs"></span><button class="nw">Neu</button></div><div style="flex:1;display:flex;align-items:center;justify-content:center;background:#2b2b2b"><canvas width="360" height="360" style="background:#111;border:2px solid #555;touch-action:none"></canvas></div><div class="status">Pfeiltasten / WASD · Leertaste: Pause · Wischen am Handy</div>`;
+ const cv=b.querySelector('canvas'),c=cv.getContext('2d'),N=20,S=18,sc=b.querySelector('.sc'),hsEl=b.querySelector('.hs');
+ let sn,dir,nd,food,score,over,started,paused,hs=+(localStorage.getItem('rx_snake')||0);
+ const place=()=>{do{food={x:Math.floor(Math.random()*N),y:Math.floor(Math.random()*N)}}while(sn.some(p=>p.x===food.x&&p.y===food.y))};
+ const upd=()=>{sc.textContent='Punkte: '+score;hsEl.textContent='Rekord: '+hs};
+ function draw(){c.fillStyle='#111';c.fillRect(0,0,360,360);
+  c.fillStyle='#e53935';c.beginPath();c.arc(food.x*S+S/2,food.y*S+S/2,S/2-2,0,7);c.fill();
+  sn.forEach((p,i)=>{c.fillStyle=i?'#43a047':'#9be37f';c.fillRect(p.x*S+1,p.y*S+1,S-2,S-2)});
+  if(over||!started||paused){c.fillStyle='rgba(0,0,0,.6)';c.fillRect(0,110,360,140);c.fillStyle='#fff';c.textAlign='center';c.font='bold 22px Tahoma';c.fillText(over?'Game Over':paused?'Pause':'Bereit?',180,165);c.font='13px Tahoma';c.fillText(over?'Punkte: '+score+' – Taste drücken für neues Spiel':'Pfeiltaste drücken zum Starten',180,195)}}
+ function reset(){sn=[{x:10,y:10},{x:9,y:10},{x:8,y:10}];dir=nd={x:1,y:0};score=0;over=false;started=false;paused=false;place();upd();draw()}
+ function tick(){if(!document.body.contains(b))return;
+  if(started&&!paused&&!over){dir=nd;const h={x:sn[0].x+dir.x,y:sn[0].y+dir.y};
+   if(h.x<0||h.y<0||h.x>=N||h.y>=N||sn.some(p=>p.x===h.x&&p.y===h.y)){over=true;if(score>hs){hs=score;try{localStorage.setItem('rx_snake',hs)}catch(e){}}tone(160,0,.4,.15);upd()}
+   else{sn.unshift(h);if(h.x===food.x&&h.y===food.y){score+=10;place();tone(660,0,.08,.1);upd()}else sn.pop()}
+   draw()}
+  setTimeout(tick,Math.max(55,125-score/2))}
+ function turn(x,y){if(over)reset();started=true;paused=false;if(!(x===-dir.x&&y===-dir.y))nd={x,y}}
+ gameKeys(b,turn,e=>{if(e.key===' '){if(started&&!over){paused=!paused;draw()}return true}});swipe(cv,turn);
+ b.querySelector('.nw').onclick=reset;reset();tick()}
+
+function game2048(){
+ const b=createWindow('2048','🔢',360,470);b.win.style.resize='none';
+ b.innerHTML=`<div class="bar"><span class="sc">Punkte: 0</span><span style="flex:1"></span><span class="hs"></span><button class="nw">Neu</button></div><div style="flex:1;display:flex;align-items:center;justify-content:center;background:#faf8ef"><div class="g48" style="display:grid;grid-template-columns:repeat(4,70px);gap:8px;padding:8px;background:#bbada0;border-radius:6px;touch-action:none"></div></div><div class="status">Pfeiltasten / WASD / Wischen · gleiche Zahlen verschmelzen</div>`;
+ const g=b.querySelector('.g48'),sc=b.querySelector('.sc'),hsEl=b.querySelector('.hs');
+ let B,score,over,best=+(localStorage.getItem('rx_2048')||0);
+ const COL={0:'#cdc1b4',2:'#eee4da',4:'#ede0c8',8:'#f2b179',16:'#f59563',32:'#f67c5f',64:'#f65e3b',128:'#edcf72',256:'#edcc61',512:'#edc850',1024:'#edc53f',2048:'#edc22e'};
+ const add=()=>{const e=[];B.forEach((r,y)=>r.forEach((v,x)=>{if(!v)e.push([x,y])}));if(!e.length)return;const[x,y]=e[Math.floor(Math.random()*e.length)];B[y][x]=Math.random()<.9?2:4};
+ function draw(){g.innerHTML='';B.forEach(r=>r.forEach(v=>{const t=document.createElement('div');t.style.cssText=`height:70px;border-radius:4px;display:flex;align-items:center;justify-content:center;font:bold ${v>=1024?20:v>=128?24:30}px Tahoma;background:${COL[v]||'#3c3a32'};color:${v>4?'#fff':'#776e65'}`;t.textContent=v||'';g.appendChild(t)}));sc.textContent='Punkte: '+score;hsEl.textContent='Rekord: '+best}
+ function slide(row){const a=row.filter(Boolean),o=[];for(let i=0;i<a.length;i++){if(a[i]===a[i+1]){o.push(a[i]*2);score+=a[i]*2;i++}else o.push(a[i])}while(o.length<4)o.push(0);return o}
+ const tr=M=>M[0].map((_,i)=>M.map(r=>r[i])),sr=r=>slide(r.slice().reverse()).reverse();
+ const canMove=()=>{for(let y=0;y<4;y++)for(let x=0;x<4;x++){if(x<3&&B[y][x]===B[y][x+1])return true;if(y<3&&B[y][x]===B[y+1][x])return true}return false};
+ function move(x,y){if(over)return;const old=JSON.stringify(B);
+  if(x===-1)B=B.map(slide);else if(x===1)B=B.map(sr);else if(y===-1)B=tr(tr(B).map(slide));else B=tr(tr(B).map(sr));
+  if(JSON.stringify(B)!==old){add();if(score>best){best=score;try{localStorage.setItem('rx_2048',best)}catch(e){}}}
+  draw();if(!B.some(r=>r.includes(0))&&!canMove()){over=true;setTimeout(()=>msg('Keine Züge mehr! Punkte: '+score,'2048','🔢'),100)}}
+ function reset(){B=[[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]];score=0;over=false;add();add();draw()}
+ gameKeys(b,move);swipe(g,move);b.querySelector('.nw').onclick=reset;reset()}
+
+function memory(){
+ const b=createWindow('Memory','🃏',360,440);b.win.style.resize='none';
+ b.innerHTML=`<div class="bar"><span class="mv">Züge: 0</span><span style="flex:1"></span><span class="bs"></span><button class="nw">Neu</button></div><div style="flex:1;display:flex;align-items:center;justify-content:center;background:#1c5b2e"><div class="mg" style="display:grid;grid-template-columns:repeat(4,68px);gap:8px"></div></div><div class="status">Finde alle Paare</div>`;
+ const E='🐶 🐱 🦊 🐸 🐼 🦁 🐙 🦄'.split(' '),g=b.querySelector('.mg'),mv=b.querySelector('.mv'),bs=b.querySelector('.bs'),st=b.querySelector('.status');
+ let cards,opn,moves,found,lock,best=+(localStorage.getItem('rx_mem')||0);
+ const show=()=>{mv.textContent='Züge: '+moves;bs.textContent=best?'Rekord: '+best+' Züge':''};
+ function reset(){const a=[...E,...E];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}
+  cards=a.map(e=>({e,f:false,o:false}));opn=[];moves=0;found=0;lock=false;st.textContent='Finde alle Paare';g.innerHTML='';
+  cards.forEach(c=>{const el=document.createElement('button');el.style.cssText='width:68px;height:68px;font-size:32px;border:2px solid #fff;border-radius:6px;background:#2f7fe0;color:#fff;cursor:pointer;padding:0';c.el=el;
+   el.onclick=()=>{if(lock||c.f||c.o)return;c.o=true;el.textContent=c.e;el.style.background='#fff';opn.push(c);tone(520,0,.06,.08);
+    if(opn.length===2){moves++;show();const[x,y]=opn;
+     if(x.e===y.e){x.f=y.f=true;found+=2;opn=[];tone(880,0,.12,.1);if(found===16){st.textContent='Geschafft in '+moves+' Zügen!';if(!best||moves<best){best=moves;try{localStorage.setItem('rx_mem',best)}catch(e){}}show();chime()}}
+     else{lock=true;setTimeout(()=>{[x,y].forEach(k=>{k.o=false;k.el.textContent='';k.el.style.background='#2f7fe0'});opn=[];lock=false},800)}}};
+   g.appendChild(el)});show()}
+ b.querySelector('.nw').onclick=reset;reset()}
+
+function tictactoe(){
+ const b=createWindow('Tic-Tac-Toe','❌',320,400);b.win.style.resize='none';
+ b.innerHTML=`<div class="bar"><span class="sc"></span><span style="flex:1"></span><button class="nw">Neu</button></div><div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#fff;gap:12px"><div class="tt" style="display:grid;grid-template-columns:repeat(3,80px);gap:6px"></div><div class="tm" style="font-size:14px;min-height:20px"></div></div>`;
+ const g=b.querySelector('.tt'),sc=b.querySelector('.sc'),tm=b.querySelector('.tm');let B,over,w=0,l=0,d=0;
+ const L=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]],win=(X,p)=>L.some(r=>r.every(i=>X[i]===p));
+ function mm(X,p,dp){if(win(X,'O'))return 10-dp;if(win(X,'X'))return dp-10;if(X.every(Boolean))return 0;let v=p==='O'?-99:99;for(let i=0;i<9;i++)if(!X[i]){X[i]=p;const r=mm(X,p==='O'?'X':'O',dp+1);X[i]='';v=p==='O'?Math.max(v,r):Math.min(v,r)}return v}
+ function cpu(){const fr=[];B.forEach((v,i)=>{if(!v)fr.push(i)});if(Math.random()<.25){B[fr[Math.floor(Math.random()*fr.length)]]='O';return}let bi=fr[0],bv=-99;fr.forEach(i=>{B[i]='O';const v=mm(B,'X',1);B[i]='';if(v>bv){bv=v;bi=i}});B[bi]='O'}
+ function end(){if(win(B,'X')){over=true;w++;tm.textContent='🎉 Du hast gewonnen!'}else if(win(B,'O')){over=true;l++;tm.textContent='Der Computer gewinnt.'}else if(B.every(Boolean)){over=true;d++;tm.textContent='Unentschieden.'}sc.textContent='Du '+w+' : '+l+' PC · Remis '+d}
+ function draw(){g.innerHTML='';B.forEach((v,i)=>{const e=document.createElement('button');e.style.cssText='width:80px;height:80px;font-size:42px;border:2px solid #7f9db9;border-radius:6px;background:#f4f8ff;cursor:pointer;padding:0;color:'+(v==='X'?'#1a4cb0':'#c0392b');e.textContent=v;e.onclick=()=>{if(over||B[i])return;B[i]='X';end();if(!over){cpu();end()}draw()};g.appendChild(e)})}
+ function reset(){B=Array(9).fill('');over=false;tm.textContent='Du bist X – du beginnst.';sc.textContent='Du '+w+' : '+l+' PC · Remis '+d;draw()}
+ b.querySelector('.nw').onclick=reset;reset()}
+
 /* ===================== Skipe (Chat) ===================== */
 const CHAT_NAME='Skipe';
 // Firebase-Konfiguration hier eintragen. null = Testmodus (nur im eigenen Browser).
@@ -524,6 +530,11 @@ const localBE=(()=>{
   async init(cb){cb(sess())},
   async register(name,pw){const l=name.toLowerCase(),u=users();if(u[l])throw new Error('Benutzername bereits vergeben.');u[l]={name,hash:await sha(pw),status:'online',last:Date.now()};LS.set('sk_users',u);const s={uid:l,name};setSess(s);emit();return s},
   async login(name,pw){const l=name.toLowerCase(),u=users()[l];if(!u||u.hash!==await sha(pw))throw new Error('Benutzername oder Passwort falsch.');const s={uid:l,name:u.name};setSess(s);touch(l,'online');return s},
+  loginName(me){return me.uid},
+  async rename(me,nn){const u=users(),nl=nn.toLowerCase();if(Object.entries(u).some(([k,x])=>k!==me.uid&&(x.name||'').toLowerCase()===nl)||(u[nl]&&nl!==me.uid))throw new Error('Dieser Name ist bereits vergeben.');u[me.uid].name=nn;LS.set('sk_users',u);const c=LS.get('sk_chats',{});Object.values(c).forEach(x=>{if(x.names&&x.names[me.uid]!==undefined)x.names[me.uid]=nn});LS.set('sk_chats',c);const s={uid:me.uid,name:nn};setSess(s);emit();return s},
+  async deleteAccount(me,pw){const u=users();if(!u[me.uid]||u[me.uid].hash!==await sha(pw))throw new Error('Das Passwort ist falsch.');delete u[me.uid];LS.set('sk_users',u);
+   const c=LS.get('sk_chats',{});for(const id in c)if(c[id].members.includes(me.uid)){delete c[id];try{localStorage.removeItem('sk_m_chat_'+id)}catch(e){}}LS.set('sk_chats',c);
+   const rk='sk_m_room_general';LS.set(rk,LS.get(rk,[]).filter(m=>m.uid!==me.uid));setSess(null);emit()},
   async logout(){setSess(null)},
   async setStatus(me,st){touch(me.uid,st)},
   async findUser(name){const l=name.toLowerCase(),u=users()[l];return u?{uid:l,name:u.name}:null},
@@ -541,16 +552,38 @@ async function fbBE(cfg){
  const [A,Au,Fs]=await Promise.all([import(B+'firebase-app.js'),import(B+'firebase-auth.js'),import(B+'firebase-firestore.js')]);
  const app=A.initializeApp(cfg),auth=Au.getAuth(app),db=Fs.getFirestore(app);
  const mail=n=>n.toLowerCase()+'@skipe.chat';
- const ERR={'auth/email-already-in-use':'Benutzername bereits vergeben.','auth/invalid-credential':'Benutzername oder Passwort falsch.','auth/wrong-password':'Benutzername oder Passwort falsch.','auth/user-not-found':'Benutzername oder Passwort falsch.','auth/invalid-login-credentials':'Benutzername oder Passwort falsch.','auth/weak-password':'Passwort zu schwach (mind. 6 Zeichen).','auth/too-many-requests':'Zu viele Versuche. Bitte später erneut versuchen.','auth/operation-not-allowed':'Anmeldung per E-Mail/Passwort ist in Firebase nicht aktiviert.'};
+ const ERR={'auth/email-already-in-use':'Benutzername bereits vergeben.','auth/invalid-credential':'Benutzername oder Passwort falsch.','auth/wrong-password':'Benutzername oder Passwort falsch.','auth/user-not-found':'Benutzername oder Passwort falsch.','auth/invalid-login-credentials':'Benutzername oder Passwort falsch.','auth/weak-password':'Passwort zu schwach (mind. 6 Zeichen).','auth/too-many-requests':'Zu viele Versuche. Bitte später erneut versuchen.','auth/requires-recent-login':'Bitte melde dich neu an und versuche es erneut.','auth/operation-not-allowed':'Anmeldung per E-Mail/Passwort ist in Firebase nicht aktiviert.'};
  const fe=e=>new Error(ERR[e.code]||('Fehler: '+(e.code||e.message)));
- const prof=async u=>{const d=await Fs.getDoc(Fs.doc(db,'users',u.uid));return{uid:u.uid,name:d.exists()?d.data().name:(u.displayName||'Benutzer')}};
+ const prof=async u=>{const d=await Fs.getDoc(Fs.doc(db,'users',u.uid));if(d.exists()){const l=d.data().nameLower;try{const n=await Fs.getDoc(Fs.doc(db,'names',l));if(!n.exists())await Fs.setDoc(Fs.doc(db,'names',l),{uid:u.uid})}catch(e){}}return{uid:u.uid,name:d.exists()?d.data().name:(u.displayName||'Benutzer')}};
  let busy=false;
  const roomRef=t=>t.kind==='room'?Fs.collection(db,'rooms',t.id,'messages'):Fs.collection(db,'chats',t.id,'messages');
  return {
   mode:'',
   init(cb){Au.onAuthStateChanged(auth,async u=>{if(busy)return;cb(u?await prof(u):null)})},
-  async register(name,pw){busy=true;try{const c=await Au.createUserWithEmailAndPassword(auth,mail(name),pw);await Fs.setDoc(Fs.doc(db,'users',c.user.uid),{name,nameLower:name.toLowerCase(),status:'online',last:Date.now()});return{uid:c.user.uid,name}}catch(e){throw fe(e)}finally{busy=false}},
+  async register(name,pw){busy=true;let c;try{c=await Au.createUserWithEmailAndPassword(auth,mail(name),pw)}catch(e){busy=false;throw fe(e)}
+   try{const l=name.toLowerCase(),bt=Fs.writeBatch(db);bt.set(Fs.doc(db,'users',c.user.uid),{name,nameLower:l,login:l,status:'online',last:Date.now()});bt.set(Fs.doc(db,'names',l),{uid:c.user.uid});await bt.commit();return{uid:c.user.uid,name}}
+   catch(e){try{await Au.deleteUser(c.user)}catch(x){}throw new Error(e.code==='permission-denied'?'Name bereits vergeben oder Firestore-Regeln nicht aktuell.':'Registrierung fehlgeschlagen.')}finally{busy=false}},
   async login(name,pw){try{const c=await Au.signInWithEmailAndPassword(auth,mail(name),pw);return await prof(c.user)}catch(e){throw fe(e)}},
+  loginName(me){return auth.currentUser?auth.currentUser.email.split('@')[0]:me.name},
+  async rename(me,nn){const nl=nn.toLowerCase(),ol=me.name.toLowerCase(),bt=Fs.writeBatch(db);
+   if(nl!==ol){bt.set(Fs.doc(db,'names',nl),{uid:me.uid});bt.delete(Fs.doc(db,'names',ol))}
+   bt.update(Fs.doc(db,'users',me.uid),{name:nn,nameLower:nl});
+   const cs=await Fs.getDocs(Fs.query(Fs.collection(db,'chats'),Fs.where('members','array-contains',me.uid)));
+   cs.docs.forEach(d=>bt.update(d.ref,{['names.'+me.uid]:nn}));
+   try{await bt.commit()}catch(e){throw new Error(e.code==='permission-denied'?'Dieser Name ist bereits vergeben (oder die Firestore-Regeln sind nicht aktuell).':'Namensänderung fehlgeschlagen.')}
+   return{uid:me.uid,name:nn}},
+  async deleteAccount(me,pw){const u=auth.currentUser;
+   try{await Au.reauthenticateWithCredential(u,Au.EmailAuthProvider.credential(u.email,pw))}catch(e){throw new Error(/credential|password/.test(e.code||'')?'Das Passwort ist falsch.':fe(e).message)}
+   busy=true;
+   try{
+    const del=async qy=>{const r=await Fs.getDocs(qy);for(let i=0;i<r.docs.length;i+=400){const bt=Fs.writeBatch(db);r.docs.slice(i,i+400).forEach(d=>bt.delete(d.ref));await bt.commit()}};
+    await del(Fs.query(Fs.collection(db,'rooms','general','messages'),Fs.where('uid','==',me.uid)));
+    const cs=await Fs.getDocs(Fs.query(Fs.collection(db,'chats'),Fs.where('members','array-contains',me.uid)));
+    for(const c of cs.docs){await del(Fs.query(Fs.collection(db,'chats',c.id,'messages'),Fs.where('uid','==',me.uid)));await Fs.deleteDoc(c.ref)}
+    const ud=await Fs.getDoc(Fs.doc(db,'users',me.uid)),bt=Fs.writeBatch(db);
+    if(ud.exists())bt.delete(Fs.doc(db,'names',ud.data().nameLower));bt.delete(Fs.doc(db,'users',me.uid));await bt.commit();
+    await Au.deleteUser(u);
+   }catch(e){throw new Error('Löschen fehlgeschlagen: '+(e.code||e.message))}finally{busy=false}},
   async logout(){await Au.signOut(auth)},
   async setStatus(me,st){await Fs.setDoc(Fs.doc(db,'users',me.uid),{status:st,last:Date.now()},{merge:true})},
   async findUser(name){const r=await Fs.getDocs(Fs.query(Fs.collection(db,'users'),Fs.where('nameLower','==',name.toLowerCase()),Fs.limit(1)));return r.empty?null:{uid:r.docs[0].id,name:r.docs[0].data().name}},
@@ -663,12 +696,25 @@ function skipe(){
  q('.sk-lo').onclick=async()=>{try{await be.logout()}catch(e){}showLogin()};
  const emo=q('.sk-emo');'😀 😁 😂 😊 😍 😎 😢 😡 👍 👎 👋 🎉 ❤️ 🔥 ⭐ ✅ 😴 🤔 🙈 💪'.split(' ').forEach(e=>{const s=document.createElement('span');s.textContent=e;s.onclick=()=>{const i=q('.sk-mi');i.value+=e;i.focus();emo.style.display='none'};emo.appendChild(s)});
  q('.sk-eb').onclick=()=>{emo.style.display=emo.style.display==='flex'?'none':'flex'};
+ function renameDlg(){const lg=be.loginName(me);
+  ask('Neuer Anzeigename (3–20 Zeichen: Buchstaben, Zahlen, _ . -):',me.name,async v=>{v=(v||'').trim();
+   if(!/^[A-Za-z0-9_.-]{3,20}$/.test(v)){msg('Ungültiger Name.','Skipe','⚠️');return}if(v===me.name)return;
+   try{const u=await be.rename(me,v);me=u;q('.sk-myname').textContent=u.name;renderMem();updateSub();msg('Dein Anzeigename ist jetzt <b>'+esc(u.name)+'</b>.<br>Zum Anmelden nutzt du weiterhin: <b>'+esc(lg)+'</b>','Skipe','✅')}
+   catch(e){msg(esc(e.message),'Skipe','⚠️')}},'Anzeigenamen ändern')}
+ function deleteDlg(){const w=createWindow('Konto löschen','🗑️',390,250);w.win.style.resize='none';w.className+=' dlg';
+  w.innerHTML='<div style="font-size:12px;text-align:center"><b>Konto endgültig löschen?</b><br>Dein Konto, dein Profil und deine Nachrichten werden entfernt. Das kann nicht rückgängig gemacht werden.</div><input type="password" placeholder="Passwort zur Bestätigung"><div class="er" style="color:#c00;min-height:15px;font-size:12px"></div><div class="r"><button class="ok">Konto löschen</button><button class="no">Abbrechen</button></div>';
+  const pw=w.querySelector('input'),er=w.querySelector('.er'),ok=w.querySelector('.ok');pw.focus();
+  const go=async()=>{if(!pw.value){er.textContent='Bitte Passwort eingeben.';return}ok.disabled=true;er.textContent='';
+   try{await be.deleteAccount(me,pw.value);w.win.close();showLogin();msg('Dein Konto wurde gelöscht.','Skipe','✅')}catch(e){er.textContent=e.message;ok.disabled=false}};
+  ok.onclick=go;pw.onkeydown=e=>{if(e.key==='Enter')go()};w.querySelector('.no').onclick=w.win.close}
  const memEl=q('.sk-mem'),toggleMem=()=>{memEl.classList.toggle('on');renderMem()};
  q('.sk-bm').onclick=toggleMem;q('.sk-mq').addEventListener('input',renderMem);
  q('.sk-bo').onclick=e=>{const r=e.currentTarget.getBoundingClientRect();ctx(r.left-120,r.bottom+2,[
   [snd?'🔔 Benachrichtigungston ausschalten':'🔕 Benachrichtigungston einschalten',()=>{snd=!snd;LS.set('sk_snd',snd)}],
   [memEl.classList.contains('on')?'👥 Mitgliederliste ausblenden':'👥 Mitgliederliste einblenden',toggleMem],
   ['🧹 Ansicht leeren (nur bei mir)',()=>{clearedAt[key()]=Date.now();renderMsgs()}],
+  ['✏️ Anzeigenamen ändern…',renameDlg],
+  ['🗑️ Konto löschen…',deleteDlg],
   ['ℹ️ Über Skipe',()=>msg('Skipe – Chat in RelaxoOS<br>Allgemeiner Chat und Privatchats.','Über Skipe','🗨️')]])};
  getBE().then(x=>{be=x;if(be.mode){const m=q('.sk-mode');m.style.display='block';m.textContent=be.mode}be.init(u=>{if(u)start(u);else showLogin()})})
   .catch(()=>{q('.sk-err').textContent='Verbindung zum Chat-Dienst fehlgeschlagen.'});
@@ -683,11 +729,16 @@ const APPLIST={
  'Rechner':['🧮',()=>calc()],
  'Zeichnen':['🎨',()=>paint()],
  'Minenfeld':['💣',()=>mines()],
+ 'Spiele':['🎮',()=>spiele()],
+ 'Snake':['🐍',()=>snake()],
+ '2048':['🔢',()=>game2048()],
+ 'Memory':['🃏',()=>memory()],
+ 'Tic-Tac-Toe':['❌',()=>tictactoe()],
  'Explorer':['📁',()=>openExplorer([])],
  'Task-Manager':['📊',()=>taskmgr()],
  'Systemsteuerung':['⚙️',()=>control()]
 };
-function getUse(){let u;try{u=JSON.parse(localStorage.getItem('rxuse'))}catch(e){}return u||{'Minenfeld':9,'Relaxo Browser':6,'Editor':4,'Rechner':3,'Zeichnen':2}}
+function getUse(){let u;try{u=JSON.parse(localStorage.getItem('rxuse'))}catch(e){}return u||{'Minenfeld':9,'Snake':7,'Relaxo Browser':6,'Editor':4,'Rechner':3,'Zeichnen':2}}
 function launch(n,noRun){hideMenu();const u=getUse();u[n]=(u[n]||0)+1;try{localStorage.setItem('rxuse',JSON.stringify(u))}catch(e){}if(!noRun)APPLIST[n][1]()}
 function showDesk(){document.querySelectorAll('.win').forEach(w=>w.style.display='none');document.querySelectorAll('.tb').forEach(t=>t.classList.remove('on'));hideMenu()}
 function balloon(t,x,f){document.querySelectorAll('.balloon').forEach(b=>b.remove());const d=document.createElement('div');d.className='balloon';d.innerHTML=`<b>${t}</b>${x}`;d.onclick=()=>{d.remove();f()};$('#desktop').appendChild(d);tone(660,0,.3,.08);setTimeout(()=>d.remove(),8000)}
@@ -702,7 +753,7 @@ function buildL(){const m=$('#mL');m.innerHTML='';
  const u=getUse();Object.keys(u).filter(n=>APPLIST[n]&&!PIN.includes(n)).sort((a,b)=>u[b]-u[a]).slice(0,5).forEach(n=>m.appendChild(mi(APPLIST[n][0],n,()=>launch(n))));
  m.appendChild(sep());
  const pr=document.createElement('div');pr.className='it';pr.innerHTML='<span class="ic">📂</span><b>Alle Programme</b><span style="margin-left:auto">▸</span>';const sb=document.createElement('div');sb.className='sub';
- [['Zubehör › Zeichnen','Zeichnen'],['Zubehör › Rechner','Rechner'],['Zubehör › Editor','Editor'],['Spiele › Minenfeld','Minenfeld'],['Relaxo Browser','Relaxo Browser'],['Explorer','Explorer'],['Skipe','Skipe'],['Anrufliste','Anrufliste']].forEach(([t,n])=>{const d=document.createElement('div');d.className='it';d.textContent=t;d.onclick=()=>launch(n);sb.appendChild(d)});
+ [['Zubehör › Zeichnen','Zeichnen'],['Zubehör › Rechner','Rechner'],['Zubehör › Editor','Editor'],['Spiele › Übersicht','Spiele'],['Spiele › Minenfeld','Minenfeld'],['Spiele › Snake','Snake'],['Spiele › 2048','2048'],['Spiele › Memory','Memory'],['Spiele › Tic-Tac-Toe','Tic-Tac-Toe'],['Relaxo Browser','Relaxo Browser'],['Explorer','Explorer'],['Skipe','Skipe'],['Anrufliste','Anrufliste']].forEach(([t,n])=>{const d=document.createElement('div');d.className='it';d.textContent=t;d.onclick=()=>launch(n);sb.appendChild(d)});
  pr.appendChild(sb);m.appendChild(pr)}
 R.forEach(a=>$('#mR').appendChild(mi(...a)));
 boot();
